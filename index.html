@@ -70,7 +70,7 @@ window.pdfjsLib=pdfjsLib;
   </section>
 
   <section id="importView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import File</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Kolom <b>INDONESIA</b> = arti. Kolom <b>KATA SIFAT NA</b> = bacaan/furigana. Kolom <b>KANJI</b> = kanji. Format ini juga bisa dipakai untuk pelajaran lain.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp" style="width:100%;margin:12px 0><button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import File</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Bisa import <b>Excel, CSV, PDF, Word, TXT, JPG, PNG, WEBP</b>. Format tabel utama: <b>NO | INDONESIA | KATA SIFAT NA (な) | KANJI</b>. Data dibaca per baris dan Kanji yang ada akan otomatis masuk ke menu Kanji.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp" style="width:100%;margin:12px 0><label class="small" style="display:flex;gap:8px;align-items:center;margin:8px 0"><input id="replaceImport" type="checkbox"> Ganti isi pelajaran ini dengan isi file (disarankan jika memasukkan daftar baru)</label><button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
   </section>
 
   <section id="addView" class="view">
@@ -172,13 +172,15 @@ window.importExcel=async function(){
       status.textContent='⚠️ File terbaca, tetapi data tidak dikenali. Untuk hasil paling akurat gunakan format kolom: NO | INDONESIA | KATA SIFAT NA (な) | KANJI.';
       return;
     }
-    let added=0;
+    const replace=document.getElementById('replaceImport')?.checked;
+    if(replace) activeLesson.vocab=[];
+    let added=0, skipped=0;
     mapped.forEach((x,i)=>{
       const exists=activeLesson.vocab.some(v=>v.jp===x.jp&&v.meaning===x.meaning&&v.furigana===x.furigana);
-      if(!exists){activeLesson.vocab.push({...x,id:uid()+i});added++;}
+      if(!exists){activeLesson.vocab.push({...x,id:uid()+i});added++;} else skipped++;
     });
     save(); renderLessonHome();
-    status.textContent='✅ '+added+' data berhasil dimasukkan ke "'+activeLesson.name+'". ('+mapped.length+' baris terbaca)';
+    status.textContent='✅ '+added+' data berhasil dimasukkan ke "'+activeLesson.name+'". '+(skipped?'Duplikat dilewati: '+skipped+'. ':'')+'Total sekarang: '+activeLesson.vocab.length+'.';
   }catch(err){
     console.error(err);
     status.textContent='❌ Gagal membaca file: '+(err.message||'format tidak dikenali')+'. Coba Excel/CSV jika PDF atau gambar tidak terbaca rapi.';
