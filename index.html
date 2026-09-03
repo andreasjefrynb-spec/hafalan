@@ -1,147 +1,152 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#b91c1c">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<title>日本語 クラス</title>
-<style>
-:root{--bg:#f8fafc;--card:#fff;--ink:#1e293b;--muted:#64748b;--red:#dc2626;--red2:#ef4444;--line:#e2e8f0;--shadow:0 10px 25px rgba(0,0,0,.05)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:30px}button,input,select{font:inherit}button{touch-action:manipulation}.hidden{display:none!important}.wrap{width:100%;max-width:600px;margin:auto;padding:0 14px}
-.hero{color:#fff;background:linear-gradient(135deg,#991b1b 0%,#dc2626 100%);padding:20px 0 16px;border-bottom-left-radius:24px;border-bottom-right-radius:24px;box-shadow:0 4px 20px rgba(220,38,38,.2)}.heroRow{display:flex;align-items:center;justify-content:space-between}.brand h1{margin:0;font-size:24px;letter-spacing:.3px}.heroBadge{background:rgba(255,255,255,.18);padding:8px 12px;border-radius:12px;text-align:center}.heroBadge b{display:block;font-size:16px}.heroBadge span{font-size:10px;opacity:.9}
-main{padding:16px 14px}.view{display:none}.view.active{display:block}.titleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.titleRow h2{margin:0;font-size:20px}.back{border:0;background:#fff;color:var(--red);font-weight:750;padding:8px 12px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer}.primary{border:0;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;font-weight:750;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 4px 12px rgba(220,38,38,.2)}.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:700;padding:8px 12px;border-radius:10px;cursor:pointer}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
-.modeGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}.modeCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 14px;cursor:pointer;transition:.15s;box-shadow:var(--shadow);text-align:center}.modeCard:active{transform:scale(.97)}.modeIcon{font-size:32px;margin-bottom:6px}.modeCard h3{margin:4px 0 2px;font-size:17px}.modeCard p{margin:0;color:var(--muted);font-size:12px}
-.search{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;outline:none;font-size:15px;margin-bottom:12px}.search:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.15)}.tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;border-collapse:collapse;min-width:400px}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}.table th{font-size:11px;color:var(--muted);text-transform:uppercase}.jp{font-size:20px;font-weight:900}.romaji{color:var(--red);font-size:13px}.furigana{font-size:11px;color:var(--red);font-weight:800;min-height:14px}.empty{text-align:center;padding:30px;color:var(--muted)}
-.kanjiGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.kanjiCard{text-align:center;padding:14px}.kanji{font-size:42px;font-weight:900;line-height:1.1}.kanjiReading{color:var(--red);font-weight:800;font-size:13px;margin-top:2px}.kanjiMeaning{margin-top:4px;font-weight:750;font-size:13px}
-.flashBox{min-height:260px;display:flex;align-items:center;justify-content:center}.flashCard{width:100%;min-height:240px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer}.flashCard .big{font-size:44px;font-weight:900}.flashCard .answerMeaning{font-size:24px;font-weight:850}.flashHint{color:var(--muted);font-size:12px;margin-bottom:8px}.controls{display:flex;justify-content:center;gap:8px;margin-top:14px}.progressText{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
-.quizCard{text-align:center}.quizWord{font-size:42px;font-weight:900;margin:10px 0}.choices{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0}.choice{border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px;font-weight:750;font-size:15px;cursor:pointer;text-align:center}.choice.correct{background:#dcfce7;border-color:#86efac;color:#166534}.choice.wrong{background:#fee2e2;border-color:#fca5a5;color:#991b1b}.feedback{min-height:22px;font-weight:800;margin-bottom:10px}
-.infoSection h3{font-size:16px;color:var(--red);margin-bottom:6px;margin-top:16px}.infoSection h3:first-child{margin-top:0}.infoSection p{margin:0 0 12px;font-size:14px;line-height:1.5}
-footer{padding:16px;text-align:center;color:var(--muted);font-size:11px}
-</style>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本語 クラス - Nihongo Class</title>
+    <!-- Menggunakan CDN Tailwind CSS untuk perapian instan -->
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        @import url('https://googleapis.com');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
 </head>
-<body>
-<header class="hero"><div class="wrap heroRow"><div class="brand"><h1>日本語 クラス</h1></div><div class="heroBadge"><b id="headerCount">0</b><span>kosakata</span></div></div></header>
-<main class="wrap">
-  <section id="lessonView" class="view active">
-    <div style="margin-bottom: 14px;"><h2 style="margin:0;font-size:20px;">Menu Belajar</h2><p style="margin:4px 0 0;color:var(--muted);font-size:13px;">Pilih mode latihan atau materi panduan di bawah ini.</p></div>
-    <div class="modeGrid">
-      <div class="modeCard" onclick="openMode('vocab')"><div class="modeIcon">📚</div><h3>Kosakata</h3><p>Daftar lengkap</p></div>
-      <div class="modeCard" onclick="openMode('kanji')"><div class="modeIcon">漢</div><h3>Kanji</h3><p>Daftar kanji</p></div>
-      <div class="modeCard" onclick="openMode('flash')"><div class="modeIcon">🃏</div><h3>Flashcard</h3><p>Kartu hafalan</p></div>
-      <div class="modeCard" onclick="openMode('quiz')"><div class="modeIcon">🧠</div><h3>Quiz</h3><p>Uji pilihan ganda</p></div>
-      <div class="modeCard" onclick="openMode('guide')" style="grid-column: span 2;"><div class="modeIcon">📖</div><h3>Panduan Bahasa</h3><p>Sistem tulisan, jenis kata, & aspek komunikasi</p></div>
-    </div>
-  </section>
+<body class="bg-slate-50 text-slate-800 antialiased">
 
-  <section id="vocabView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Menu</button><h2 style="font-size:18px;margin:0">📚 Kosakata</h2></div>
-    <div class="card" style="padding:12px;"><input id="search" class="search" placeholder="Cari kata..." oninput="renderVocab()"><div class="tableWrap"><table class="table"><thead><tr><th>Jepang</th><th>Furigana</th><th>Romaji</th><th>Arti</th></tr></thead><tbody id="vocabBody"></tbody></table></div></div>
-  </section>
+    <div class="flex flex-col md:flex-row min-h-screen">
+        <!-- SIDEBAR NAVIGASI -->
+        <aside class="w-full md:w-64 bg-white border-r border-slate-200 p-6 flex flex-col justify-between shrink-0">
+            <div>
+                <!-- Logo / Judul Aplikasi -->
+                <div class="flex items-center gap-3 mb-8">
+                    <span class="text-2xl bg-indigo-50 text-indigo-600 p-2 rounded-xl font-bold">🇯🇵</span>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight">日本語 クラス</h1>
+                        <p class="text-xs text-slate-400">0 Kosakata Terpilih</p>
+                    </div>
+                </div>
 
-  <section id="kanjiView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Menu</button><h2 style="font-size:18px;margin:0">漢字 Kanji</h2></div>
-    <div class="card" style="padding:12px;"><input id="kanjiSearch" class="search" placeholder="Cari kanji..." oninput="renderKanji()"><div id="kanjiGrid" class="kanjiGrid"></div></div>
-  </section>
+                <!-- Menu Navigasi -->
+                <nav class="space-y-1">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 px-3">Menu Belajar</p>
+                    <a href="#kosakata" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-50 text-indigo-600 font-medium text-sm transition-all">
+                        <span>📚</span> Kosakata
+                    </a>
+                    <a href="#kanji" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-all">
+                        <span>漢</span> Kanji
+                    </a>
+                    <a href="#flashcard" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-all">
+                        <span>🃏</span> Flashcard
+                    </a>
+                    <a href="#quiz" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-all">
+                        <span>🧠</span> Quiz
+                    </a>
+                    <a href="#panduan" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-medium text-sm transition-all">
+                        <span>📖</span> Panduan Bahasa
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- Footer Sidebar -->
+            <div class="pt-6 border-t border-slate-100 text-xs text-slate-400 text-center">
+                &copy; 2026 日本語 クラス
+            </div>
+        </aside>
 
-  <section id="flashView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Menu</button><h2 style="font-size:18px;margin:0">🃏 Flashcard</h2></div>
-    <div class="card"><div class="flashBox"><div id="flashCard" class="flashCard" onclick="flipCard()"></div></div><div class="controls"><button class="secondary" onclick="prevCard()">← Prev</button><button class="primary" onclick="masterCard()">✓ Hafal</button><button class="secondary" onclick="nextCard()">Next →</button></div><div id="flashProgress" class="progressText"></div></div>
-  </section>
+        <!-- AREA KONTEN UTAMA -->
+        <main class="flex-1 p-6 md:p-10 max-w-5xl mx-auto w-full space-y-12">
+            
+            <!-- SECTION 1: KOSAKATA -->
+            <section id="kosakata" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2"><span>📚</span> Kosakata</h2>
+                        <p class="text-sm text-slate-400">Daftar lengkap pembendaharaan kata Anda</p>
+                    </div>
+                </div>
+                <!-- Tabel Rapi & Responsif -->
+                <div class="overflow-x-auto rounded-xl border border-slate-100">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold uppercase border-b border-slate-100">
+                                <th class="p-4">Jepang</th>
+                                <th class="p-4">Furigana</th>
+                                <th class="p-4">Romaji</th>
+                                <th class="p-4">Arti</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm">
+                            <tr class="hover:bg-slate-50/80 transition-colors">
+                                <td class="p-4 font-medium text-slate-900">学生</td>
+                                <td class="p-4 text-slate-500">がくせい</td>
+                                <td class="p-4 text-slate-500 italic">gakusei</td>
+                                <td class="p-4 text-slate-700">Siswa / Mahasiswa</td>
+                            </tr>
+                            <!-- Baris kosong atau data berikutnya dimasukkan di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-  <section id="quizView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Menu</button><h2 style="font-size:18px;margin:0">🧠 Quiz</h2></div>
-    <div class="card quizCard"><div style="color:var(--muted);font-size:12px">Pertanyaan <span id="qNum">1</span></div><div id="qWord" class="quizWord">—</div><div id="qFuri" class="furigana" style="font-size:14px;margin-bottom:10px"></div><div id="choices" class="choices"></div><div id="quizFeedback" class="feedback"></div><button class="primary" style="width:100%" onclick="newQuiz()">Soal Berikutnya →</button></div>
-  </section>
+            <!-- SECTION 2: KANJI -->
+            <section id="kanji" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h2 class="text-xl font-bold flex items-center gap-2"><span>漢</span> Kanji</h2>
+                    <p class="text-sm text-slate-400">Daftar karakter kanji beserta maknanya</p>
+                </div>
+                <!-- Grid untuk Kartu Kanji -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="border border-slate-100 p-4 rounded-xl text-center hover:border-indigo-100 hover:shadow-sm transition-all bg-slate-50/50">
+                        <span class="text-3xl font-bold block mb-1">日</span>
+                        <span class="text-xs text-slate-400 block">Hari / Matahari</span>
+                    </div>
+                    <div class="border border-slate-100 p-4 rounded-xl text-center hover:border-indigo-100 hover:shadow-sm transition-all bg-slate-50/50">
+                        <span class="text-3xl font-bold block mb-1">本</span>
+                        <span class="text-xs text-slate-400 block">Buku / Asal</span>
+                    </div>
+                </div>
+            </section>
 
-  <section id="guideView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Menu</button><h2 style="font-size:18px;margin:0">📖 Panduan Bahasa</h2></div>
-    <div class="card infoSection">
-      <h3 style="margin-top:0">Sistem Tulisan</h3>
-      <p><b>Hiragana:</b> Huruf dasar untuk kata asli Jepang dan tata bahasa.</p>
-      <p><b>Katakana:</b> Huruf untuk menulis kata serapan dari bahasa asing.</p>
-      <p><b>Kanji:</b> Karakter Tionghoa yang dipakai untuk menyatakan makna dasar kata.</p>
-      <p><b>Romaji:</b> Huruf Latin untuk membantu membaca cara pengucapan bahasa Jepang.</p>
+            <!-- SECTION 3: FLASHCARD -->
+            <section id="flashcard" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="border-b border-slate-100 pb-4 mb-6">
+                    <h2 class="text-xl font-bold flex items-center gap-2"><span>🃏</span> Flashcard</h2>
+                    <p class="text-sm text-slate-400">Gunakan kartu ini untuk melatih ingatan Anda secara aktif</p>
+                </div>
+                <!-- Wadah Kartu Utama -->
+                <div class="max-w-md mx-auto my-6">
+                    <div class="bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-12 rounded-2xl text-center shadow-lg min-h-[200px] flex flex-col justify-center items-center mb-6 relative overflow-hidden group cursor-pointer">
+                        <span class="text-4xl font-bold tracking-wide">犬 (いぬ)</span>
+                        <p class="text-indigo-200 text-xs mt-3 opacity-80">Klik untuk melihat arti</p>
+                    </div>
+                    <!-- Navigasi Kontrol Flashcard -->
+                    <div class="flex items-center justify-between gap-4">
+                        <button class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">← Prev</button>
+                        <button class="flex-1 px-4 py-2 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 shadow-sm transition-all">✓ Hafal</button>
+                        <button class="px-4 py-2 border border-slate-200 rounded-xl text-sm font-medium text-slate-600 hover:bg-slate-50 transition-all">Next →</button>
+                    </div>
+                </div>
+            </section>
 
-      <h3>Jenis Kata (Kosakata)</h3>
-      <p><b>Kata Benda (Meishi):</b> Nama orang, benda, tempat, atau konsep (contoh: inu / anjing, gakusei / siswa).</p>
-      <p><b>Kata Sifat (Keiyoushi & Keiyoudoushi):</b> Kata sifat berakhiran -i seperti akai (merah) dan kata sifat berakhiran -na seperti kirei (cantik/bersih).</p>
-      <p><b>Kata Keterangan (Fukushi):</b> Kata penjelas untuk frekuensi atau tingkat (contoh: totemo / sangat, itsumo / selalu).</p>
-      <p><b>Kata Bantu / Partikel (Joshibi):</b> Penanda fungsi kata dalam kalimat seperti wa, ga, o, dan ni.</p>
-
-      <h3>Aspek Komunikasi Lainnya</h3>
-      <p><b>Keigo (Bahasa Sopan):</b> Tingkatan bahasa halus yang dipakai untuk menghormati lawan bicara atau atasan (teineigo, sonkeigo, dan kenjougo).</p>
-      <p><b>Budaya dan Konteks Sosial:</b> Pemahaman kebiasaan atau situasi saat menggunakan suatu ungkapan agar tidak salah paham.</p>
-    </div>
-  </section>
-</main>
-<footer>日本語 クラス</footer>
-
-<script src="kotoba.js"></script>
-
-<script>
-(function(){
-'use strict';
-const KEY='nihongoClassData_v9';
-
-let vocab = (window.MASTER_KOTOBA || []).map((x,i)=>({
-    id:'v'+i, jp:x[0], furigana:x[1], romaji:x[2], meaning:x[3], example:'', mastered:false
-}));
-
-let current=0,flipped=false,quizIndex=0,quizLocked=false;
-document.getElementById('headerCount').textContent=vocab.length;
-
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function showOnly(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
-
-window.showLesson=function(){showOnly('lessonView');};
-window.openMode=function(mode){showOnly(mode+'View');if(mode==='vocab')renderVocab();if(mode==='kanji')renderKanji();if(mode==='flash'){current=0;flipped=false;loadCard()}if(mode==='quiz')newQuiz();};
-
-function renderVocab(){
-  const q=(document.getElementById('search').value||'').toLowerCase();
-  const rows=vocab.filter(x=>(x.jp+' '+x.furigana+' '+x.romaji+' '+x.meaning).toLowerCase().includes(q));
-  document.getElementById('vocabBody').innerHTML=rows.length?rows.map(x=>`<tr><td><span class="jp">${esc(x.jp)}</span></td><td><span class="furigana">${esc(x.furigana||'—')}</span></td><td class="romaji">${esc(x.romaji||'—')}</td><td>${esc(x.meaning)}</td></tr>`).join(''): '<tr><td colspan="4" class="empty">Tidak ada hasil.</td></tr>';
-}
-
-function uniqueKanjiRows(){const seen=new Set(),out=[];vocab.forEach(x=>{const raw=String(x.jp||'').trim();if(!/[一-龯々]/.test(raw))return;const key=raw+'|'+(x.furigana||'');if(!seen.has(key)){seen.add(key);out.push(x)}});return out;}
-function renderKanji(){
-  const q=(document.getElementById('kanjiSearch').value||'').toLowerCase();
-  const rows=uniqueKanjiRows().filter(x=>(x.jp+' '+x.furigana+' '+x.meaning).toLowerCase().includes(q));
-  document.getElementById('kanjiGrid').innerHTML=rows.length?rows.map(x=>`<article class="card kanjiCard"><div class="kanji">${esc(x.jp)}</div><div class="kanjiReading">${esc(x.furigana||'—')}</div><div class="kanjiMeaning">${esc(x.meaning)}</div></article>`).join(''):'<div class="card empty" style="grid-column:span 2">Tidak ada Kanji.</div>';
-}
-
-function cardList(){return vocab.filter(x=>x.jp&&x.meaning)}
-window.flipCard=function(){const list=cardList();if(!list.length)return;flipped=!flipped;renderFlash(list[current]);};
-function loadCard(){const list=cardList();const box=document.getElementById('flashCard');if(!list.length){box.innerHTML='<div><div class="big">📭</div><p class="muted">Kosong</p></div>';document.getElementById('flashProgress').textContent='';return}if(current>=list.length)current=0;if(current<0)current=list.length-1;renderFlash(list[current]);}
-function renderFlash(listItem){
-  const x=listItem;
-  document.getElementById('flashCard').innerHTML=flipped?`<div><div class="flashHint">Arti</div><div class="answerMeaning">${esc(x.meaning)}</div></div>`:`<div><div class="flashHint">Ketuk untuk melihat arti</div><div class="big">${esc(x.jp)}</div><div class="furigana" style="margin-top:6px">${esc(x.furigana||'')}</div></div>`;
-  document.getElementById('flashProgress').textContent=(current+1)+' / '+list.length;
-}
-window.nextCard=function(){const list=cardList();if(!list.length)return;current=(current+1)%list.length;flipped=false;loadCard();};
-window.prevCard=function(){const list=cardList();if(!list.length)return;current=(current-1+list.length)%list.length;flipped=false;loadCard();};
-window.masterCard=function(){nextCard();};
-
-function newQuiz(){
-  const list=cardList();quizLocked=false;document.getElementById('quizFeedback').textContent='';
-  if(!list.length){document.getElementById('qWord').textContent='—';document.getElementById('choices').innerHTML='';return}
-  quizIndex=Math.floor(Math.random()*list.length);const x=list[quizIndex];
-  document.getElementById('qNum').textContent='?';document.getElementById('qWord').textContent=x.jp;document.getElementById('qFuri').textContent=x.furigana||'';
-  const others=list.filter((_,i)=>i!==quizIndex).sort(()=>Math.random()-.5).slice(0,3);
-  const choices=[x,...others].sort(()=>Math.random()-.5);
-  document.getElementById('choices').innerHTML=choices.map(c=>`<button class="choice" onclick="answerQuiz('${esc(c.id)}',this)">${esc(c.meaning)}</button>`).join('');
-}
-window.newQuiz=newQuiz;
-window.answerQuiz=function(id,btn){
-  if(quizLocked)return;quizLocked=true;const list=cardList(),x=list[quizIndex];
-  document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
-  if(String(id)===String(x.id)){btn.classList.add('correct');document.getElementById('quizFeedback').textContent='✅ Benar!';}
-  else{btn.classList.add('wrong');document.getElementById('quizFeedback').textContent='❌ Salah. Jawaban: '+x.meaning;document.querySelectorAll('.choice').forEach(b=>{if(b.textContent===x.meaning)b.classList.add('correct')})}
-};
-
-showLesson();
-})();
-</script>
-</body>
-</html>
+            <!-- SECTION 4: QUIZ -->
+            <section id="quiz" class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2"><span>🧠</span> Quiz</h2>
+                        <p class="text-sm text-slate-400">Pertanyaan 1 dari 10</p>
+                    </div>
+                </div>
+                <!-- Area Soal -->
+                <div class="space-y-6">
+                    <div class="p-6 bg-slate-50 rounded-xl border border-slate-100">
+                        <h3 class="font-semibold text-lg text-slate-800">Apa arti dari kosakata "友達 (ともだち - tomodachi)"?</h3>
+                    </div>
+                    <!-- Pilihan Ganda -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <button class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all text-sm font-medium">A. Guru</button>
+                        <button class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all text-sm font-medium">B. Teman</button>
+                        <button class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all text-sm font-medium">C. Keluarga</button>
+                        <button class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/30 transition-all text-sm font-medium">D. Sekolah</button>
+                    </div>
+                    <!-- Tombol Lanjut -->
+                    <div class="flex justify-end">
