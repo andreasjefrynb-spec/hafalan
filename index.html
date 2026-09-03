@@ -12,7 +12,7 @@
 .hero{color:#fff;background:linear-gradient(135deg,#991b1b 0%,#dc2626 100%);padding:20px 0 16px;border-bottom-left-radius:24px;border-bottom-right-radius:24px;box-shadow:0 4px 20px rgba(220,38,38,.2)}.heroRow{display:flex;align-items:center;justify-content:space-between}.brand h1{margin:0;font-size:24px;letter-spacing:.3px}.heroBadge{background:rgba(255,255,255,.18);padding:8px 12px;border-radius:12px;text-align:center}.heroBadge b{display:block;font-size:16px}.heroBadge span{font-size:10px;opacity:.9}
 main{padding:16px 14px}.view{display:none}.view.active{display:block}.titleRow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}.titleRow h2{margin:0;font-size:20px}.back{border:0;background:#fff;color:var(--red);font-weight:750;padding:8px 12px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.05);cursor:pointer}.primary{border:0;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;font-weight:750;padding:10px 14px;border-radius:10px;cursor:pointer;box-shadow:0 4px 12px rgba(220,38,38,.2)}.secondary{border:1px solid var(--line);background:#fff;color:var(--ink);font-weight:700;padding:8px 12px;border-radius:10px;cursor:pointer}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
 .modeGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}.modeCard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 14px;cursor:pointer;transition:.15s;box-shadow:var(--shadow);text-align:center}.modeCard:active{transform:scale(.97)}.modeIcon{font-size:32px;margin-bottom:6px}.modeCard h3{margin:4px 0 2px;font-size:17px}.modeCard p{margin:0;color:var(--muted);font-size:12px}
-.search{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;outline:none;font-size:15px;margin-bottom:12px}.search:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.15)}.tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;border-collapse:collapse;min-width:480px}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}.table th{font-size:11px;color:var(--muted);text-transform:uppercase}.jp{font-size:20px;font-weight:900}.romaji{color:var(--red);font-size:13px}.furigana{font-size:11px;color:var(--red);font-weight:800;min-height:14px}.tag{display:inline-block;padding:3px 7px;border-radius:99px;background:#f1f5f9;font-size:11px;font-weight:800}.empty{text-align:center;padding:30px;color:var(--muted)}
+.search{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;outline:none;font-size:15px;margin-bottom:12px}.search:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(220,38,38,.15)}.tableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch}.table{width:100%;border-collapse:collapse;min-width:400px}.table th,.table td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:middle}.table th{font-size:11px;color:var(--muted);text-transform:uppercase}.jp{font-size:20px;font-weight:900}.romaji{color:var(--red);font-size:13px}.furigana{font-size:11px;color:var(--red);font-weight:800;min-height:14px}.empty{text-align:center;padding:30px;color:var(--muted)}
 .kanjiGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.kanjiCard{text-align:center;padding:14px}.kanji{font-size:42px;font-weight:900;line-height:1.1}.kanjiReading{color:var(--red);font-weight:800;font-size:13px;margin-top:2px}.kanjiMeaning{margin-top:4px;font-weight:750;font-size:13px}
 .flashBox{min-height:260px;display:flex;align-items:center;justify-content:center}.flashCard{width:100%;min-height:240px;border-radius:20px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;cursor:pointer}.flashCard .big{font-size:44px;font-weight:900}.flashCard .answerMeaning{font-size:24px;font-weight:850}.flashHint{color:var(--muted);font-size:12px;margin-bottom:8px}.controls{display:flex;justify-content:center;gap:8px;margin-top:14px}.progressText{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
 .quizCard{text-align:center}.quizWord{font-size:42px;font-weight:900;margin:10px 0}.choices{display:grid;grid-template-columns:1fr;gap:10px;margin:16px 0}.choice{border:1px solid var(--line);background:#fff;border-radius:12px;padding:14px;font-weight:750;font-size:15px;cursor:pointer;text-align:center}.choice.correct{background:#dcfce7;border-color:#86efac;color:#166534}.choice.wrong{background:#fee2e2;border-color:#fca5a5;color:#991b1b}.feedback{min-height:22px;font-weight:800;margin-bottom:10px}
@@ -35,7 +35,7 @@ footer{padding:16px;text-align:center;color:var(--muted);font-size:11px}
 
   <section id="vocabView" class="view">
     <div class="titleRow"><button class="back" onclick="showLesson()">← Menu</button><h2 style="font-size:18px;margin:0">📚 Kosakata</h2></div>
-    <div class="card" style="padding:12px;"><input id="search" class="search" placeholder="Cari kata..." oninput="renderVocab()"><div class="tableWrap"><table class="table"><thead><tr><th>Jepang</th><th>Furigana</th><th>Romaji</th><th>Arti</th><th>Level</th></tr></thead><tbody id="vocabBody"></tbody></table></div></div>
+    <div class="card" style="padding:12px;"><input id="search" class="search" placeholder="Cari kata..." oninput="renderVocab()"><div class="tableWrap"><table class="table"><thead><tr><th>Jepang</th><th>Furigana</th><th>Romaji</th><th>Arti</th></tr></thead><tbody id="vocabBody"></tbody></table></div></div>
   </section>
 
   <section id="kanjiView" class="view">
@@ -60,10 +60,10 @@ footer{padding:16px;text-align:center;color:var(--muted);font-size:11px}
 <script>
 (function(){
 'use strict';
-const KEY='nihongoClassData_v7';
+const KEY='nihongoClassData_v8';
 
 let vocab = (window.MASTER_KOTOBA || []).map((x,i)=>({
-    id:'v'+i, jp:x[0], furigana:x[1], romaji:x[2], meaning:x[3], level:x[4]||'N5', example:'', mastered:false
+    id:'v'+i, jp:x[0], furigana:x[1], romaji:x[2], meaning:x[3], example:'', mastered:false
 }));
 
 let current=0,flipped=false,quizIndex=0,quizLocked=false;
@@ -78,7 +78,7 @@ window.openMode=function(mode){showOnly(mode+'View');if(mode==='vocab')renderVoc
 function renderVocab(){
   const q=(document.getElementById('search').value||'').toLowerCase();
   const rows=vocab.filter(x=>(x.jp+' '+x.furigana+' '+x.romaji+' '+x.meaning).toLowerCase().includes(q));
-  document.getElementById('vocabBody').innerHTML=rows.length?rows.map(x=>`<tr><td><span class="jp">${esc(x.jp)}</span></td><td><span class="furigana">${esc(x.furigana||'—')}</span></td><td class="romaji">${esc(x.romaji||'—')}</td><td>${esc(x.meaning)}</td><td><span class="tag">${esc(x.level||'N5')}</span></td></tr>`).join(''): '<tr><td colspan="5" class="empty">Tidak ada hasil.</td></tr>';
+  document.getElementById('vocabBody').innerHTML=rows.length?rows.map(x=>`<tr><td><span class="jp">${esc(x.jp)}</span></td><td><span class="furigana">${esc(x.furigana||'—')}</span></td><td class="romaji">${esc(x.romaji||'—')}</td><td>${esc(x.meaning)}</td></tr>`).join(''): '<tr><td colspan="4" class="empty">Tidak ada hasil.</td></tr>';
 }
 
 function uniqueKanjiRows(){const seen=new Set(),out=[];vocab.forEach(x=>{const raw=String(x.jp||'').trim();if(!/[一-龯々]/.test(raw))return;const key=raw+'|'+(x.furigana||'');if(!seen.has(key)){seen.add(key);out.push(x)}});return out;}
