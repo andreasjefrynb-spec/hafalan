@@ -23,6 +23,13 @@ footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}.mobileT
 @media(max-width:480px){.modeGrid{grid-template-columns:1fr 1fr}.modeCard{padding:15px}.modeCard h3{font-size:15px}.modeCard p{font-size:12px}.brand h1{font-size:25px}.brand p{font-size:13px}.lessonHero h2{font-size:23px}.primary,.secondary{padding:10px 12px}.flashCard{min-height:280px}.flashCard .big{font-size:42px}.quizWord{font-size:42px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script type="module">
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
+window.pdfjsLib=pdfjsLib;
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <header class="hero"><div class="wrap heroRow"><div class="brand"><h1>日本語 クラス</h1><p>🇯🇵 N5・N4 学習アプリ — 単語・漢字・フラッシュカード・クイズ</p></div><div class="heroBadge"><b id="headerCount">0</b><span>kosakata pelajaran</span></div></div></header>
@@ -33,7 +40,7 @@ footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}.mobileT
   </section>
 
   <section id="lessonView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLessons()">← Semua Pelajaran</button><button class="secondary" onclick="openImport()">📥 Import Excel</button></div>
+    <div class="titleRow"><button class="back" onclick="showLessons()">← Semua Pelajaran</button><button class="secondary" onclick="openImport()">📥 Import File</button></div>
     <div class="lessonHero card"><div><h2 id="lessonTitle">Pelajaran</h2><p id="lessonDesc"></p></div><div><span class="tag" id="lessonCount">0 kosakata</span></div></div>
     <div class="modeGrid">
       <div class="modeCard" onclick="openMode('vocab')"><div class="modeIcon">📚</div><h3>Kosakata</h3><p>Lihat, cari, edit, dan hapus kosakata.</p></div>
@@ -63,7 +70,7 @@ footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}.mobileT
   </section>
 
   <section id="importView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import Excel</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Kolom <b>INDONESIA</b> = arti. Kolom <b>KATA SIFAT NA</b> = bacaan/furigana. Kolom <b>KANJI</b> = kanji. Format ini juga bisa dipakai untuk pelajaran lain.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv" style="width:100%;margin:12px 0"><button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import File</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Kolom <b>INDONESIA</b> = arti. Kolom <b>KATA SIFAT NA</b> = bacaan/furigana. Kolom <b>KANJI</b> = kanji. Format ini juga bisa dipakai untuk pelajaran lain.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp" style="width:100%;margin:12px 0><button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
   </section>
 
   <section id="addView" class="view">
@@ -119,7 +126,7 @@ window.deleteVocab=function(id){const x=activeLesson.vocab.find(v=>String(v.id)=
 window.openAddOne=function(){showOnly('addView');['newJp','newFurigana','newRomaji','newMeaning','newExample'].forEach(id=>document.getElementById(id).value='');};
 window.addVocab=function(){const jp=document.getElementById('newJp').value.trim(),fur=document.getElementById('newFurigana').value.trim(),rom=document.getElementById('newRomaji').value.trim(),meaning=document.getElementById('newMeaning').value.trim(),level=document.getElementById('newLevel').value,example=document.getElementById('newExample').value.trim();if(!jp||!meaning){alert('Isi Kanji/Jepang dan arti.');return}activeLesson.vocab.push({id:uid(),jp,furigana:fur,romaji:rom,meaning,level,example,mastered:false});save();showLesson();};
 function uniqueKanjiRows(){const seen=new Set(),out=[];(activeLesson.vocab||[]).forEach(x=>{const raw=String(x.jp||'').trim();const hasKanji=/[一-龯々]/.test(raw);if(!hasKanji)return;const key=raw+'|'+(x.furigana||'');if(!seen.has(key)){seen.add(key);out.push(x)}});return out;}
-function renderKanji(){const q=(document.getElementById('kanjiSearch').value||'').toLowerCase();const rows=uniqueKanjiRows().filter(x=>(x.jp+' '+x.furigana+' '+x.meaning).toLowerCase().includes(q));document.getElementById('kanjiTitle').textContent='漢字 Kanji — '+activeLesson.name;document.getElementById('kanjiGrid').innerHTML=rows.length?rows.map(x=>`<article class="card kanjiCard"><div class="kanji">${esc(x.jp)}</div><div class="kanjiReading">${esc(x.furigana||'—')}</div><div class="kanjiMeaning">${esc(x.meaning)}</div>${x.example?`<div class="example">${esc(x.example)}</div>`:''}</article>`).join(''):'<div class="card empty">Belum ada Kanji pada pelajaran ini. Import Excel dengan kolom KANJI untuk mengisinya.</div>';}
+function renderKanji(){const q=(document.getElementById('kanjiSearch').value||'').toLowerCase();const rows=uniqueKanjiRows().filter(x=>(x.jp+' '+x.furigana+' '+x.meaning).toLowerCase().includes(q));document.getElementById('kanjiTitle').textContent='漢字 Kanji — '+activeLesson.name;document.getElementById('kanjiGrid').innerHTML=rows.length?rows.map(x=>`<article class="card kanjiCard"><div class="kanji">${esc(x.jp)}</div><div class="kanjiReading">${esc(x.furigana||'—')}</div><div class="kanjiMeaning">${esc(x.meaning)}</div>${x.example?`<div class="example">${esc(x.example)}</div>`:''}</article>`).join(''):'<div class="card empty">Belum ada Kanji pada pelajaran ini. Import File dengan kolom KANJI untuk mengisinya.</div>';}
 function cardList(){return (activeLesson.vocab||[]).filter(x=>x.jp&&x.meaning)}
 window.flipCard=function(){const list=cardList();if(!list.length)return;flipped=!flipped;renderFlash(list[current]);};
 function loadCard(){const list=cardList();const box=document.getElementById('flashCard');if(!list.length){box.innerHTML='<div><div class="big">📭</div><p class="muted">Belum ada kosakata.</p></div>';document.getElementById('flashProgress').textContent='';return}if(current>=list.length)current=0;if(current<0)current=list.length-1;renderFlash(list[current]);}
@@ -128,7 +135,129 @@ window.nextCard=function(){const list=cardList();if(!list.length)return;current=
 function newQuiz(){const list=cardList();quizLocked=false;document.getElementById('quizFeedback').textContent='';if(!list.length){document.getElementById('qWord').textContent='—';document.getElementById('qFuri').textContent='Belum ada data';document.getElementById('choices').innerHTML='';return}quizIndex=Math.floor(Math.random()*list.length);const x=list[quizIndex];document.getElementById('qNum').textContent='?';document.getElementById('qWord').textContent=x.jp;document.getElementById('qFuri').textContent=x.furigana||'';const others=list.filter((_,i)=>i!==quizIndex).sort(()=>Math.random()-.5).slice(0,3);const choices=[x,...others].sort(()=>Math.random()-.5);document.getElementById('choices').innerHTML=choices.map(c=>`<button class="choice" onclick="answerQuiz('${esc(c.id)}',this)">${esc(c.meaning)}</button>`).join('');}
 window.newQuiz=newQuiz;window.answerQuiz=function(id,btn){if(quizLocked)return;quizLocked=true;const list=cardList(),x=list[quizIndex];document.querySelectorAll('.choice').forEach(b=>b.disabled=true);if(String(id)===String(x.id)){btn.classList.add('correct');document.getElementById('quizFeedback').textContent='✅ Benar!';x.mastered=true;save()}else{btn.classList.add('wrong');document.getElementById('quizFeedback').textContent='❌ Belum tepat. Jawaban: '+x.meaning;document.querySelectorAll('.choice').forEach(b=>{if(b.textContent===x.meaning)b.classList.add('correct')})}};
 window.openImport=function(){document.getElementById('importLessonName').textContent=activeLesson.name;document.getElementById('importStatus').textContent='';document.getElementById('excelFile').value='';showOnly('importView');};
-window.importExcel=function(){const file=document.getElementById('excelFile').files[0],status=document.getElementById('importStatus');if(!file){status.textContent='⚠️ Pilih file Excel terlebih dahulu.';return}if(typeof XLSX==='undefined'){status.textContent='❌ Library Excel belum termuat. Pastikan internet aktif lalu coba lagi.';return}const reader=new FileReader();reader.onload=e=>{try{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{defval:''});if(!rows.length){status.textContent='⚠️ Excel kosong.';return}let added=0;rows.forEach((row,i)=>{const o={};Object.keys(row).forEach(k=>o[normalizeHeader(k)]=row[k]);const meaning=String(o.indonesia||o.arti||o.meaning||'').trim();let reading=String(o.katasifatnaな||o.katasifatna||o.katabacaan||o.bacaan||o.hiragana||o.jepang||o.kata||'').trim();let kanji=String(o.kanji||'').trim();reading=stripNa(reading);kanji=stripNa(kanji);if(!meaning)return;const jp=kanji&&kanji!=='—'&&kanji!=='-'?kanji:reading;if(!jp)return;const exists=activeLesson.vocab.some(v=>v.jp===jp&&v.meaning===meaning&&v.furigana===reading);if(exists)return;activeLesson.vocab.push({id:uid()+i,jp,furigana:reading,romaji:String(o.romaji||'').trim(),meaning,level:String(o.level||'N5').toUpperCase()==='N4'?'N4':'N5',example:String(o.contoh||o.example||'').trim(),mastered:false});added++});save();status.textContent='✅ '+added+' kosakata berhasil dimasukkan ke "'+activeLesson.name+'".';renderLessonHome();}catch(err){console.error(err);status.textContent='❌ Gagal membaca Excel. Periksa format file dan coba lagi.'}};reader.readAsArrayBuffer(file);};
+window.importExcel=async function(){
+  const file=document.getElementById('excelFile').files[0],status=document.getElementById('importStatus');
+  if(!file){status.textContent='⚠️ Pilih file terlebih dahulu.';return}
+  status.textContent='⏳ Membaca '+file.name+'...';
+  try{
+    const ext=(file.name.split('.').pop()||'').toLowerCase();
+    let rows=[];
+    if(['xlsx','xls','csv'].includes(ext)){
+      if(typeof XLSX==='undefined') throw new Error('Library Excel belum termuat');
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+    }else if(ext==='txt'){
+      const text=await file.text();
+      rows=parseTextRows(text);
+    }else if(ext==='docx'){
+      if(typeof mammoth==='undefined') throw new Error('Library Word belum termuat');
+      const buf=await file.arrayBuffer();
+      const result=await mammoth.extractRawText({arrayBuffer:buf});
+      rows=parseTextRows(result.value);
+    }else if(ext==='pdf'){
+      rows=await parsePdfRows(file);
+    }else if(['jpg','jpeg','png','webp'].includes(ext)){
+      if(typeof Tesseract==='undefined') throw new Error('Library OCR belum termuat');
+      status.textContent='⏳ Membaca gambar dengan OCR...';
+      const result=await Tesseract.recognize(file,'jpn+eng');
+      rows=parseTextRows(result.data.text);
+    }else{
+      throw new Error('Format file belum didukung');
+    }
+
+    const mapped=rows.map((row,i)=>mapImportedRow(row,i)).filter(x=>x && x.jp && x.meaning);
+    if(!mapped.length){
+      status.textContent='⚠️ File terbaca, tetapi data tidak dikenali. Untuk hasil paling akurat gunakan format kolom: NO | INDONESIA | KATA SIFAT NA (な) | KANJI.';
+      return;
+    }
+    let added=0;
+    mapped.forEach((x,i)=>{
+      const exists=activeLesson.vocab.some(v=>v.jp===x.jp&&v.meaning===x.meaning&&v.furigana===x.furigana);
+      if(!exists){activeLesson.vocab.push({...x,id:uid()+i});added++;}
+    });
+    save(); renderLessonHome();
+    status.textContent='✅ '+added+' data berhasil dimasukkan ke "'+activeLesson.name+'". ('+mapped.length+' baris terbaca)';
+  }catch(err){
+    console.error(err);
+    status.textContent='❌ Gagal membaca file: '+(err.message||'format tidak dikenali')+'. Coba Excel/CSV jika PDF atau gambar tidak terbaca rapi.';
+  }
+};
+
+function normText(v){return String(v??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()}
+function parseTextRows(text){
+  const lines=String(text||'').split(/\r?\n/).map(normText).filter(Boolean);
+  if(!lines.length)return [];
+  const header=lines[0].toLowerCase();
+  // Delimited text / copied spreadsheet.
+  if(header.includes('indonesia') && (header.includes('kanji')||header.includes('kata sifat'))){
+    const delim=header.includes('\t')?'\t':(header.includes(';')?';':',');
+    return lines.slice(1).map(line=>{
+      const a=line.split(delim).map(normText);
+      return {NO:a[0]||'',INDONESIA:a[1]||'', 'KATA SIFAT NA (な)':a[2]||'', KANJI:a[3]||''};
+    });
+  }
+  // Simple lines: Indonesia | Japanese | Kanji OR Japanese | Arti.
+  return lines.map((line,i)=>{
+    const a=line.split(/\t|\s+\|\s+|;|\s{3,}/).map(normText).filter(Boolean);
+    if(a.length>=4)return {NO:a[0],INDONESIA:a[1],'KATA SIFAT NA (な)':a[2],KANJI:a[3]};
+    if(a.length===3)return {INDONESIA:a[0],'KATA SIFAT NA (な)':a[1],KANJI:a[2]};
+    if(a.length>=2)return {INDONESIA:a[0],'KATA SIFAT NA (な)':a[1]};
+    return {INDONESIA:'', 'KATA SIFAT NA (な)':a[0]};
+  });
+}
+async function parsePdfRows(file){
+  // PDF.js is loaded as a module; wait briefly for the global helper to become available.
+  if(!window.pdfjsLib) throw new Error('PDF reader belum siap. Muat ulang halaman lalu coba lagi');
+  const data=new Uint8Array(await file.arrayBuffer());
+  const pdf=await window.pdfjsLib.getDocument({data}).promise;
+  const out=[];
+  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
+    const page=await pdf.getPage(pageNo), content=await page.getTextContent();
+    const items=content.items.map(it=>({t:normText(it.str),x:it.transform[4],y:it.transform[5]})).filter(it=>it.t);
+    const rows=[];
+    items.sort((a,b)=>b.y-a.y||a.x-b.x).forEach(it=>{
+      let row=rows.find(r=>Math.abs(r.y-it.y)<5);
+      if(!row){row={y:it.y,items:[]};rows.push(row)}
+      row.items.push(it);
+    });
+    rows.sort((a,b)=>b.y-a.y).forEach(r=>{
+      r.items.sort((a,b)=>a.x-b.x);
+      const cells=[];
+      r.items.forEach(it=>{
+        let cell=cells.find(c=>Math.abs(c.x-it.x)<35);
+        if(!cell){cell={x:it.x,t:it.t};cells.push(cell)}
+        else cell.t+=' '+it.t;
+      });
+      const vals=cells.sort((a,b)=>a.x-b.x).map(c=>normText(c.t));
+      if(vals.length>=4) out.push({NO:vals[0],INDONESIA:vals[1],'KATA SIFAT NA (な)':vals[2],KANJI:vals.slice(3).join(' ')});
+      else if(vals.length>=2) out.push({INDONESIA:vals[0],'KATA SIFAT NA (な)':vals[1],KANJI:vals[2]||''});
+    });
+  }
+  return out;
+}
+function mapImportedRow(row,i){
+  const o={}; Object.keys(row||{}).forEach(k=>o[normalizeHeader(k)]=row[k]);
+  let meaning=normText(o.indonesia||o.arti||o.meaning||o.terjemahan||'');
+  let reading=normText(o.katasifatnaな||o.katasifatna||o.katabacaan||o.bacaan||o.furigana||o.hiragana||o.jepang||o.kata||o.reading||'');
+  let kanji=normText(o.kanji||'');
+  reading=stripNa(reading); kanji=stripNa(kanji);
+  // If a row came from a generic text/PDF extraction, detect Japanese fields.
+  if(!reading && !kanji){
+    const vals=Object.values(row||{}).map(normText);
+    const jp=vals.find(v=>/[\u3040-\u30ff\u3400-\u9fff]/.test(v));
+    if(jp) reading=jp;
+    if(!meaning) meaning=vals.find(v=>v && !/[\u3040-\u30ff\u3400-\u9fff]/.test(v) && !/^\d+$/.test(v))||'';
+  }
+  const jp=kanji&&kanji!=='—'&&kanji!=='-'?kanji:reading;
+  if(!jp||!meaning)return null;
+  return {
+    jp, furigana:reading, romaji:normText(o.romaji||o.romaji_||''),
+    meaning, level:(String(o.level||'N5').toUpperCase()==='N4'?'N4':'N5'),
+    example:normText(o.contoh||o.example||o.reibun||''), mastered:false
+  };
+}
 window.downloadTemplate=function(){if(typeof XLSX==='undefined'){alert('Library Excel belum termuat. Pastikan internet aktif.');return}const data=[['NO','INDONESIA','KATA SIFAT NA (な)','KANJI'],[1,'Cantik / Bersih','きれい（な）','—'],[2,'Tampan','ハンサム（な）','—'],[3,'Baik Hati','しんせつ（な）','親切（な）'],[4,'Sehat','げんき（な）','元気（な）'],[5,'Terkenal','ゆうめい（な）','有名（な）'],[6,'Ramai','にぎやか（な）','—'],[7,'Sepi, Tenang','しずか（な）','静か（な）']];const ws=XLSX.utils.aoa_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Kosakata');XLSX.writeFile(wb,'template_kosakata_jp.xlsx');};
 function init(){renderLessons();renderLessonHome();}
 init();
