@@ -204,6 +204,89 @@ let current=0, flipped=false, qIndex=0, correct=0, answered=0;
 
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>showPanel(b.dataset.panel));
 function showPanel(id){document.querySelectorAll(".panel").forEach(x=>x.classList.remove("active"));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelector(`[data-panel="${id}"]`).classList.add("active");if(id==="lessons")renderLessons();if(id==="vocab")renderVocab();if(id==="kanji")renderKanji();if(id==="flash")loadCard();if(id==="quiz")newQuiz();if(id==="add"){document.getElementById("importLessonName").textContent=activeLesson.name}updateStats()}
+
+function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+function renderLessons(){
+  const grid=document.getElementById("lessonGrid");
+  if(!grid)return;
+  document.getElementById("activeLessonName").textContent=activeLesson.name;
+  grid.innerHTML=lessons.map(l=>`<div class="card lessonCard ${l.id===activeLesson.id?"active":""}">
+    <h3>📘 ${escapeHtml(l.name)}</h3>
+    <p class="muted">${escapeHtml(l.description||"Pelajaran bahasa Jepang")}</p>
+    <b>${(l.vocab||[]).length} kosakata</b>
+    <div class="lessonActions">
+      <button class="primary" onclick="selectLesson('${String(l.id).replace(/'/g,"\\'")}')">${l.id===activeLesson.id?"✓ Sedang dipakai":"Pilih"}</button>
+      <button class="secondary" onclick="renameLesson('${String(l.id).replace(/'/g,"\\'")}')">✏️ Edit</button>
+      ${l.id!=="default"?`<button class="secondary" onclick="deleteLesson('${String(l.id).replace(/'/g,"\\'")}')">🗑️ Hapus</button>`:""}
+    </div>
+  </div>`).join("");
+}
+function addLesson(){
+  const name=prompt("Nama pelajaran baru, contoh: Kata Sifat NA");
+  if(!name||!name.trim())return;
+  const desc=prompt("Keterangan pelajaran (opsional):","Materi bahasa Jepang");
+  const lesson={id:"lesson_"+Date.now(),name:name.trim(),description:(desc||"").trim(),vocab:[]};
+  lessons.push(lesson); activeLesson=lesson; vocab=[];
+  save(); renderLessons(); renderVocab(); showPanel("add");
+}
+function selectLesson(id){
+  const l=lessons.find(x=>String(x.id)===String(id)); if(!l)return;
+  activeLesson=l; activeLessonId=l.id; vocab=l.vocab||[];
+  localStorage.setItem("jpActiveLesson",l.id);
+  localStorage.setItem("jpVocab",JSON.stringify(vocab));
+  renderLessons(); renderVocab(); loadCard(); updateStats(); showPanel("vocab");
+}
+function renameLesson(id){
+  const l=lessons.find(x=>String(x.id)===String(id)); if(!l)return;
+  const name=prompt("Nama pelajaran:",l.name); if(!name||!name.trim())return;
+  const desc=prompt("Keterangan:",l.description||"");
+  l.name=name.trim(); l.description=(desc||"").trim();
+  if(activeLesson.id===l.id)activeLesson=l;
+  save(); renderLessons();
+}
+function deleteLesson(id){
+  if(id==="default"){alert("Pelajaran utama tidak bisa dihapus.");return;}
+  const l=lessons.find(x=>String(x.id)===String(id)); if(!l)return;
+  if(!confirm(`Hapus pelajaran "${l.name}" beserta kosakatanya?`))return;
+  lessons=lessons.filter(x=>String(x.id)!==String(id));
+  if(activeLesson.id===l.id){activeLesson=lessons[0];vocab=activeLesson.vocab||[];}
+  localStorage.setItem("jpLessons",JSON.stringify(lessons));
+  localStorage.setItem("jpActiveLesson",activeLesson.id);
+  localStorage.setItem("jpVocab",JSON.stringify(vocab));
+  renderLessons(); renderVocab();
+}
+function editVocab(id){
+  const x=vocab.find(v=>String(v.id)===String(id)); if(!x)return;
+  const jp=prompt("Kanji / Jepang:",x.jp); if(jp===null)return;
+  const fur=prompt("Furigana / cara baca:",x.furigana||"");
+  const rom=prompt("Romaji:",x.romaji||"");
+  const meaning=prompt("Arti Indonesia:",x.meaning||"");
+  const level=prompt("Level (N5/N4):",x.level||"N5");
+  const example=prompt("Contoh kalimat:",x.example||"");
+  x.jp=jp.trim();x.furigana=(fur||"").trim();x.romaji=(rom||"").trim();x.meaning=(meaning||"").trim();
+  x.level=String(level||"N5").toUpperCase()==="N4"?"N4":"N5";x.example=(example||"").trim();
+  save();renderVocab();
+}
+function deleteVocab(id){
+  const x=vocab.find(v=>String(v.id)===String(id));if(!x)return;
+  if(!confirm(`Hapus "${x.jp}"?`))return;
+  vocab=vocab.filter(v=>String(v.id)!==String(id));save();renderVocab();loadCard();
+}
+function addVocab(){
+  const jp=document.getElementById("newJp").value.trim();
+  const fur=document.getElementById("newFurigana").value.trim();
+  const rom=document.getElementById("newRomaji").value.trim();
+  const meaning=document.getElementById("newMeaning").value.trim();
+  const level=document.getElementById("newLevel").value;
+  const example=document.getElementById("newExample").value.trim();
+  if(!jp||!meaning){alert("Isi Jepang dan arti.");return;}
+  vocab.push({id:Date.now()+Math.random(),jp,furigana:fur,romaji:rom,meaning,level,example,mastered:false});
+  save();renderVocab();
+  ["newJp","newFurigana","newRomaji","newMeaning","newExample"].forEach(id=>document.getElementById(id).value="");
+  showPanel("vocab");
+}
+function cleanNa(v){return String(v||"").replace(/[（(]\s*な\s*[）)]/g,"").trim()}
+
 function save(){activeLesson.vocab=vocab;lessons=lessons.map(l=>l.id===activeLesson.id?activeLesson:l);localStorage.setItem("jpLessons",JSON.stringify(lessons));localStorage.setItem("jpActiveLesson",activeLesson.id);localStorage.setItem("jpVocab",JSON.stringify(vocab));updateStats()}
 
 
@@ -223,7 +306,7 @@ function importExcel(){
       const mapped=rows.map((row,i)=>{
         const o={}; Object.keys(row).forEach(k=>o[normalizeHeader(k)]=row[k]);
         const meaning=String(o.indonesia||o.arti||o.meaning||"").trim();
-        const reading=cleanNa(o.katasifatna(n)||o.katabacaan||o.bacaan||o.hiragana||o.jepang||o.kata||"");
+        const reading=cleanNa(o["katasifatna(n)"]||o.katasifatna||o.katabacaan||o.bacaan||o.hiragana||o.jepang||o.kata||"");
         const kanji=cleanNa(o.kanji||"");
         const jp=(kanji && kanji!=="—" && kanji!=="-")?kanji:reading;
         return {id:Date.now()+Math.random()+i,jp,furigana:reading,romaji:String(o.romaji||"").trim(),meaning,level:(String(o.level||"N5").toUpperCase()==="N4"?"N4":"N5"),example:String(o.contoh||o.example||"").trim(),mastered:false};
