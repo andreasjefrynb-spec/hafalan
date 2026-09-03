@@ -70,7 +70,7 @@ footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
 <script>
 (function(){
 'use strict';
-const KEY='nihongoClassData_v4';
+const KEY='nihongoClassData_v6'; // Diubah versinya agar memaksa muat data baru
 
 let data=loadData();
 let activeLessonId=data.activeLessonId;
@@ -81,23 +81,18 @@ function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&l
 function getLesson(){return data.lessons.find(x=>String(x.id)===String(activeLessonId))||data.lessons[0];}
 
 function loadData(){
-  try{
-    const raw=localStorage.getItem(KEY); 
-    if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.lessons)&&d.lessons.length){return d;}}
-  }catch(e){console.warn(e)}
-  
-  // Mengambil data dari file kotoba.js eksternal
+  // Selalu muat ulang langsung dari file kotoba.js eksternal agar data ribuan kata selalu sinkron
   let vocab = (window.MASTER_KOTOBA || []).map((x,i)=>({
       id:'v'+i, jp:x[0], furigana:x[1], romaji:x[2], meaning:x[3], level:x[4]||'N5', example:'', mastered:false
   }));
 
   const lessons=[{id:'default',name:'Kosakata Master N5-N4',description:'Ribuan Kosakata Utama',vocab:vocab}];
   const d={lessons,activeLessonId:'default'};
-  localStorage.setItem(KEY,JSON.stringify(d));
+  try{ localStorage.setItem(KEY,JSON.stringify(d)); }catch(e){console.warn(e)}
   return d;
 }
 
-function save(){data.activeLessonId=activeLesson.id;localStorage.setItem(KEY,JSON.stringify(data));}
+function save(){data.activeLessonId=activeLesson.id;}
 function showOnly(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 window.showLessons=function(){showOnly('lessonsView');renderLessons();};
 window.showLesson=function(){showOnly('lessonView');renderLessonHome();};
