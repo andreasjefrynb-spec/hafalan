@@ -30,6 +30,7 @@ window.pdfjsLib=pdfjsLib;
 </script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <header class="hero"><div class="wrap heroRow"><div class="brand"><h1>日本語 クラス</h1><p>🇯🇵 N5・N4 学習アプリ — 単語・漢字・フラッシュカード・クイズ</p></div><div class="heroBadge"><b id="headerCount">0</b><span>kosakata pelajaran</span></div></div></header>
@@ -70,14 +71,15 @@ window.pdfjsLib=pdfjsLib;
   </section>
 
   <section id="importView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import File</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Bisa import <b>Excel, CSV, PDF, Word, TXT, JPG, PNG, WEBP</b>. Format tabel utama: <b>NO | INDONESIA | KATA SIFAT NA (な) | KANJI</b>. Data dibaca per baris dan Kanji yang ada akan otomatis masuk ke menu Kanji.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp" style="width:100%;margin:12px 0><label class="small" style="display:flex;gap:8px;align-items:center;margin:8px 0"><input id="replaceImport" type="checkbox"> Ganti isi pelajaran ini dengan isi file (disarankan jika memasukkan daftar baru)</label><button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import File</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Kolom <b>INDONESIA</b> = arti. Kolom <b>KATA SIFAT NA</b> = bacaan/furigana. Kolom <b>KANJI</b> = kanji. Format ini juga bisa dipakai untuk pelajaran lain.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp" style="width:100%;margin:12px 0">
+<button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
   </section>
 
   <section id="addView" class="view">
     <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card"><h2>＋ Tambah Kosakata</h2><p class="muted">Kosakata akan disimpan di pelajaran aktif.</p><div class="formGrid"><div class="field"><label>Kanji / Jepang</label><input id="newJp" placeholder="親切"></div><div class="field"><label>Furigana</label><input id="newFurigana" placeholder="しんせつ"></div><div class="field"><label>Romaji</label><input id="newRomaji" placeholder="shinsetsu"></div><div class="field"><label>Arti Indonesia</label><input id="newMeaning" placeholder="baik hati"></div><div class="field"><label>Level</label><select id="newLevel"><option>N5</option><option>N4</option></select></div><div class="field"><label>Contoh kalimat</label><input id="newExample" placeholder="親切な人です。"></div></div><div class="controls" style="justify-content:flex-start"><button class="primary" onclick="addVocab()">Simpan</button></div></div>
   </section>
 </main>
-<footer>日本語 クラス • Data tersimpan di perangkat/browser kamu.</footer>
+<footer>日本語 クラス • Data tersimpan di database Supabase.</footer>
 <script>
 (function(){
 'use strict';
@@ -91,7 +93,7 @@ let activeLesson=getLesson();
 let current=0,flipped=false,quizIndex=0,quizLocked=false;
 
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
+function uid(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():(Date.now().toString(36)+Math.random().toString(36).slice(2,10));}
 function stripNa(v){return String(v??'').replace(/[（(]\s*な\s*[）)]/g,'').trim();}
 function normalizeHeader(v){return String(v??'').toLowerCase().trim().replace(/[\s_\-]+/g,'').replace(/[（）()]/g,'');}
 function getLesson(){return data.lessons.find(x=>String(x.id)===String(activeLessonId))||data.lessons[0];}
@@ -105,7 +107,29 @@ function loadData(){
   const lessons=[{id:'default',name:'Kosakata N5–N4',description:'Kosakata utama N5–N4',vocab:vocab}];
   const d={lessons,activeLessonId:'default'};localStorage.setItem(KEY,JSON.stringify(d));return d;
 }
-function save(){data.activeLessonId=activeLesson.id;localStorage.setItem(KEY,JSON.stringify(data));try{localStorage.setItem('jpLessons',JSON.stringify(data.lessons));localStorage.setItem('jpActiveLesson',activeLesson.id);localStorage.setItem('jpVocab',JSON.stringify(activeLesson.vocab));}catch(e){console.warn(e)}}
+const SUPABASE_URL='https://vrrcbplvqfyljdlvxmxr.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_xiI3d-I4AkKi1wwbQHIXkg_z9MBxAKH';
+const cloud=(window.supabase&&window.supabase.createClient)?window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY):null;
+let cloudReady=false;
+function save(){data.activeLessonId=activeLesson.id;localStorage.setItem(KEY,JSON.stringify(data));try{localStorage.setItem('jpLessons',JSON.stringify(data.lessons));localStorage.setItem('jpActiveLesson',activeLesson.id);localStorage.setItem('jpVocab',JSON.stringify(activeLesson.vocab));}catch(e){console.warn(e)}; if(cloudReady) syncActiveLesson().catch(e=>console.warn('Cloud sync:',e));}
+function dbVocab(v){return {id:isUuid(v.id)?v.id:undefined,lesson_id:activeLesson.id,no:Number.isFinite(Number(v.no))?Number(v.no):null,indonesia:v.meaning||'',japanese:v.jp||'',furigana:v.furigana||'',romaji:v.romaji||'',kanji:/[一-龯々]/.test(v.jp||'')?(v.kanji||v.jp||''):(v.kanji||''),contoh:v.example||'',level:v.level||'N5'};}
+function isUuid(v){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(v||''));}
+async function syncActiveLesson(){if(!cloud||!activeLesson||!isUuid(activeLesson.id))return;const l={id:activeLesson.id,name:activeLesson.name,description:activeLesson.description||''};let {error}=await cloud.from('lessons').upsert(l,{onConflict:'id'});if(error)throw error;const rows=(activeLesson.vocab||[]).map(dbVocab);if(rows.length){const clean=rows.map(r=>{const x={...r};if(!x.id)delete x.id;return x});const r=await cloud.from('vocabulary').upsert(clean,{onConflict:'id'});if(r.error)throw r.error;}}
+async function syncFromCloud(){
+  if(!cloud)return;
+  const lr=await cloud.from('lessons').select('*').order('created_at',{ascending:true});
+  if(lr.error)throw lr.error;
+  const vr=await cloud.from('vocabulary').select('*').order('no',{ascending:true});
+  if(vr.error)throw vr.error;
+  const lessons=(lr.data||[]).map(l=>({id:l.id,name:l.name,description:l.description||'',vocab:[]}));
+  (vr.data||[]).forEach(v=>{const l=lessons.find(x=>x.id===v.lesson_id);if(l)l.vocab.push({id:v.id,jp:v.japanese||'',furigana:v.furigana||'',romaji:v.romaji||'',meaning:v.indonesia||'',level:v.level||'N5',example:v.contoh||'',kanji:v.kanji||'',no:v.no,mastered:false});});
+  if(lessons.length){data.lessons=lessons;activeLessonId=data.activeLessonId&&lessons.some(l=>l.id===data.activeLessonId)?data.activeLessonId:lessons[0].id;activeLesson=getLesson();data.activeLessonId=activeLesson.id;localStorage.setItem(KEY,JSON.stringify(data));renderLessons();renderLessonHome();}
+}
+async function initCloud(){
+  if(!cloud)return;
+  try{await syncFromCloud();cloudReady=true;console.log('Supabase terhubung.');}
+  catch(e){console.warn('Supabase belum tersambung:',e);}
+}
 function showOnly(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 window.showLessons=function(){showOnly('lessonsView');renderLessons();};
 window.showLesson=function(){showOnly('lessonView');renderLessonHome();};
@@ -118,13 +142,13 @@ window.selectLesson=function(id){const l=data.lessons.find(x=>String(x.id)===Str
 window.openNewLesson=function(){const name=prompt('Nama pelajaran baru, contoh: Kata Sifat な');if(!name||!name.trim())return;const desc=prompt('Keterangan pelajaran (opsional):','Materi bahasa Jepang')||'';const l={id:uid(),name:name.trim(),description:desc.trim(),vocab:[]};data.lessons.push(l);activeLesson=l;activeLessonId=l.id;save();showLesson();};
 window.editLesson=function(id){const l=data.lessons.find(x=>String(x.id)===String(id));if(!l)return;const name=prompt('Nama pelajaran:',l.name);if(!name||!name.trim())return;const desc=prompt('Keterangan:',l.description||'')??l.description;l.name=name.trim();l.description=desc.trim();save();renderLessons();if(activeLesson.id===l.id)renderLessonHome();};
 window.editCurrentLesson=function(){editLesson(activeLesson.id);};
-window.deleteLesson=function(id){if(id==='default'){alert('Pelajaran utama tidak bisa dihapus.');return}const l=data.lessons.find(x=>String(x.id)===String(id));if(!l)return;if(!confirm('Hapus pelajaran "'+l.name+'" beserta datanya?'))return;data.lessons=data.lessons.filter(x=>String(x.id)!==String(id));activeLesson=data.lessons[0];activeLessonId=activeLesson.id;save();showLessons();};
+window.deleteLesson=async function(id){if(id==='default'){alert('Pelajaran utama tidak bisa dihapus.');return}const l=data.lessons.find(x=>String(x.id)===String(id));if(!l)return;if(!confirm('Hapus pelajaran "'+l.name+'" beserta datanya?'))return;if(cloudReady&&isUuid(id)){const r=await cloud.from('lessons').delete().eq('id',id);if(r.error){alert('Gagal menghapus dari database: '+r.error.message);return;}}data.lessons=data.lessons.filter(x=>String(x.id)!==String(id));activeLesson=data.lessons[0];activeLessonId=activeLesson.id;save();showLessons();};
 function renderLessonHome(){document.getElementById('lessonTitle').textContent='📘 '+activeLesson.name;document.getElementById('lessonDesc').textContent=activeLesson.description||'Materi bahasa Jepang';document.getElementById('lessonCount').textContent=(activeLesson.vocab||[]).length+' kosakata';document.getElementById('headerCount').textContent=(activeLesson.vocab||[]).length;}
 function renderVocab(){const q=(document.getElementById('search').value||'').toLowerCase();document.getElementById('vocabTitle').textContent='📚 '+activeLesson.name;const rows=(activeLesson.vocab||[]).filter(x=>(x.jp+' '+x.furigana+' '+x.romaji+' '+x.meaning).toLowerCase().includes(q));const body=document.getElementById('vocabBody');body.innerHTML=rows.length?rows.map(x=>`<tr><td><span class="jp">${esc(x.jp)}</span></td><td><span class="furigana">${esc(x.furigana||'—')}</span></td><td class="romaji">${esc(x.romaji||'—')}</td><td>${esc(x.meaning)}</td><td><span class="tag">${esc(x.level||'N5')}</span></td><td><div class="actions"><button class="secondary" onclick="editVocab('${esc(x.id)}')">✏️</button><button class="secondary" onclick="deleteVocab('${esc(x.id)}')">🗑️</button></div></td></tr>`).join(''): '<tr><td colspan="6" class="empty">Belum ada kosakata di pelajaran ini.</td></tr>';}
 window.editVocab=function(id){const x=activeLesson.vocab.find(v=>String(v.id)===String(id));if(!x)return;const jp=prompt('Kanji / Jepang:',x.jp);if(jp===null)return;const fur=prompt('Furigana:',x.furigana||'');if(fur===null)return;const rom=prompt('Romaji:',x.romaji||'');if(rom===null)return;const meaning=prompt('Arti Indonesia:',x.meaning||'');if(meaning===null)return;const level=prompt('Level (N5/N4):',x.level||'N5');if(level===null)return;const ex=prompt('Contoh kalimat:',x.example||'');if(ex===null)return;Object.assign(x,{jp:jp.trim(),furigana:fur.trim(),romaji:rom.trim(),meaning:meaning.trim(),level:level.trim().toUpperCase()==='N4'?'N4':'N5',example:ex.trim()});save();renderVocab();renderKanji();};
-window.deleteVocab=function(id){const x=activeLesson.vocab.find(v=>String(v.id)===String(id));if(!x)return;if(!confirm('Hapus "'+x.jp+'"?'))return;activeLesson.vocab=activeLesson.vocab.filter(v=>String(v.id)!==String(id));save();renderVocab();renderKanji();loadCard();};
+window.deleteVocab=async function(id){const x=activeLesson.vocab.find(v=>String(v.id)===String(id));if(!x)return;if(!confirm('Hapus "'+x.jp+'"?'))return;activeLesson.vocab=activeLesson.vocab.filter(v=>String(v.id)!==String(id));if(cloudReady&&isUuid(id)){const r=await cloud.from('vocabulary').delete().eq('id',id);if(r.error){alert('Gagal menghapus dari database: '+r.error.message);return;}}save();renderVocab();renderKanji();loadCard();};
 window.openAddOne=function(){showOnly('addView');['newJp','newFurigana','newRomaji','newMeaning','newExample'].forEach(id=>document.getElementById(id).value='');};
-window.addVocab=function(){const jp=document.getElementById('newJp').value.trim(),fur=document.getElementById('newFurigana').value.trim(),rom=document.getElementById('newRomaji').value.trim(),meaning=document.getElementById('newMeaning').value.trim(),level=document.getElementById('newLevel').value,example=document.getElementById('newExample').value.trim();if(!jp||!meaning){alert('Isi Kanji/Jepang dan arti.');return}activeLesson.vocab.push({id:uid(),jp,furigana:fur,romaji:rom,meaning,level,example,mastered:false});save();showLesson();};
+window.addVocab=function(){const jp=document.getElementById('newJp').value.trim(),fur=document.getElementById('newFurigana').value.trim(),rom=document.getElementById('newRomaji').value.trim(),meaning=document.getElementById('newMeaning').value.trim(),level=document.getElementById('newLevel').value,example=document.getElementById('newExample').value.trim();if(!jp||!meaning){alert('Isi Kanji/Jepang dan arti.');return}activeLesson.vocab.push({id:uid(),no:(activeLesson.vocab||[]).length+1,jp,furigana:fur,romaji:rom,meaning,level,example,mastered:false});save();showLesson();};
 function uniqueKanjiRows(){const seen=new Set(),out=[];(activeLesson.vocab||[]).forEach(x=>{const raw=String(x.jp||'').trim();const hasKanji=/[一-龯々]/.test(raw);if(!hasKanji)return;const key=raw+'|'+(x.furigana||'');if(!seen.has(key)){seen.add(key);out.push(x)}});return out;}
 function renderKanji(){const q=(document.getElementById('kanjiSearch').value||'').toLowerCase();const rows=uniqueKanjiRows().filter(x=>(x.jp+' '+x.furigana+' '+x.meaning).toLowerCase().includes(q));document.getElementById('kanjiTitle').textContent='漢字 Kanji — '+activeLesson.name;document.getElementById('kanjiGrid').innerHTML=rows.length?rows.map(x=>`<article class="card kanjiCard"><div class="kanji">${esc(x.jp)}</div><div class="kanjiReading">${esc(x.furigana||'—')}</div><div class="kanjiMeaning">${esc(x.meaning)}</div>${x.example?`<div class="example">${esc(x.example)}</div>`:''}</article>`).join(''):'<div class="card empty">Belum ada Kanji pada pelajaran ini. Import File dengan kolom KANJI untuk mengisinya.</div>';}
 function cardList(){return (activeLesson.vocab||[]).filter(x=>x.jp&&x.meaning)}
@@ -172,15 +196,13 @@ window.importExcel=async function(){
       status.textContent='⚠️ File terbaca, tetapi data tidak dikenali. Untuk hasil paling akurat gunakan format kolom: NO | INDONESIA | KATA SIFAT NA (な) | KANJI.';
       return;
     }
-    const replace=document.getElementById('replaceImport')?.checked;
-    if(replace) activeLesson.vocab=[];
-    let added=0, skipped=0;
+    let added=0;
     mapped.forEach((x,i)=>{
       const exists=activeLesson.vocab.some(v=>v.jp===x.jp&&v.meaning===x.meaning&&v.furigana===x.furigana);
-      if(!exists){activeLesson.vocab.push({...x,id:uid()+i});added++;} else skipped++;
+      if(!exists){activeLesson.vocab.push({...x,id:uid(),no:(activeLesson.vocab||[]).length+1});added++;}
     });
     save(); renderLessonHome();
-    status.textContent='✅ '+added+' data berhasil dimasukkan ke "'+activeLesson.name+'". '+(skipped?'Duplikat dilewati: '+skipped+'. ':'')+'Total sekarang: '+activeLesson.vocab.length+'.';
+    status.textContent='✅ '+added+' data berhasil dimasukkan ke "'+activeLesson.name+'". ('+mapped.length+' baris terbaca)';
   }catch(err){
     console.error(err);
     status.textContent='❌ Gagal membaca file: '+(err.message||'format tidak dikenali')+'. Coba Excel/CSV jika PDF atau gambar tidak terbaca rapi.';
@@ -263,6 +285,7 @@ function mapImportedRow(row,i){
 window.downloadTemplate=function(){if(typeof XLSX==='undefined'){alert('Library Excel belum termuat. Pastikan internet aktif.');return}const data=[['NO','INDONESIA','KATA SIFAT NA (な)','KANJI'],[1,'Cantik / Bersih','きれい（な）','—'],[2,'Tampan','ハンサム（な）','—'],[3,'Baik Hati','しんせつ（な）','親切（な）'],[4,'Sehat','げんき（な）','元気（な）'],[5,'Terkenal','ゆうめい（な）','有名（な）'],[6,'Ramai','にぎやか（な）','—'],[7,'Sepi, Tenang','しずか（な）','静か（な）']];const ws=XLSX.utils.aoa_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Kosakata');XLSX.writeFile(wb,'template_kosakata_jp.xlsx');};
 function init(){renderLessons();renderLessonHome();}
 init();
+initCloud();
 })();
 </script>
 </body>
