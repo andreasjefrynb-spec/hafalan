@@ -18,114 +18,59 @@ main{padding:28px 18px 70px}.view{display:none}.view.active{display:block}.title
 .flashBox{min-height:330px;display:flex;align-items:center;justify-content:center}.flashCard{width:min(650px,100%);min-height:310px;border-radius:25px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;text-align:center;padding:30px;cursor:pointer}.flashCard .big{font-size:54px;font-weight:950}.flashCard .answerMeaning{font-size:30px;font-weight:900}.flashHint{color:var(--muted);margin-bottom:10px}.controls{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin-top:15px}.progressText{text-align:center;color:var(--muted);margin-top:12px}
 .quizCard{max-width:760px;margin:auto;text-align:center}.quizWord{font-size:52px;font-weight:950;margin:12px 0}.choices{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:22px auto;max-width:650px}.choice{border:1px solid var(--line);background:#fff;border-radius:13px;padding:15px;font-weight:800;cursor:pointer}.choice.correct{background:#dcfce7;border-color:#86efac}.choice.wrong{background:#fee2e2;border-color:#fca5a5}.feedback{min-height:24px;font-weight:800}
 .formGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field label{display:block;font-size:13px;font-weight:850;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px;background:#fff;outline:none}.field.full{grid-column:1/-1}.importPreview{overflow:auto}.formatTable{width:100%;border-collapse:collapse;min-width:600px}.formatTable th,.formatTable td{padding:10px;border:1px solid var(--line);text-align:left}.importBox{border:2px dashed #fecaca;background:#fffafa}.status{margin:12px 0 0;font-weight:750}.small{font-size:13px}.muted{color:var(--muted)}
-footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}.mobileTop{display:none}
+footer{padding:20px;text-align:center;color:var(--muted);font-size:12px}
 @media(max-width:800px){.heroRow{align-items:flex-start}.heroBadge{display:none}.modeGrid{grid-template-columns:repeat(2,1fr)}.lessonHero{align-items:flex-start;flex-direction:column}.titleRow{align-items:flex-start;flex-direction:column}.formGrid{grid-template-columns:1fr}.field.full{grid-column:auto}.choices{grid-template-columns:1fr}.wrap{padding:0 14px}main{padding:20px 14px 80px}.card{border-radius:17px;padding:16px}.table{min-width:590px}.lessonGrid{grid-template-columns:1fr}}
-@media(max-width:480px){.modeGrid{grid-template-columns:1fr 1fr}.modeCard{padding:15px}.modeCard h3{font-size:15px}.modeCard p{font-size:12px}.brand h1{font-size:25px}.brand p{font-size:13px}.lessonHero h2{font-size:23px}.primary,.secondary{padding:10px 12px}.flashCard{min-height:280px}.flashCard .big{font-size:42px}.quizWord{font-size:42px}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script type="module">
-import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs";
-pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs";
-window.pdfjsLib=pdfjsLib;
-</script>
-<script src="https://cdn.jsdelivr.net/npm/mammoth@1.8.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
-<header class="hero"><div class="wrap heroRow"><div class="brand"><h1>日本語 クラス</h1><p>🇯🇵 N5・N4 学習アプリ — 単語・漢字・フラッシュカード・クイズ</p></div><div class="heroBadge"><b id="headerCount">0</b><span>kosakata pelajaran</span></div></div></header>
+<header class="hero"><div class="wrap heroRow"><div class="brand"><h1>日本語 クラス</h1><p>🇯🇵 N5・N4 学習アプリ</p></div><div class="heroBadge"><b id="headerCount">0</b><span>kosakata</span></div></div></header>
 <main class="wrap">
   <section id="lessonsView" class="view active">
-    <div class="titleRow"><div><h2>📖 Pelajaran</h2><p class="muted">Pilih materi dulu, lalu tentukan cara belajarnya.</p></div><button class="primary" onclick="openNewLesson()">＋ Tambah Pelajaran</button></div>
+    <div class="titleRow"><div><h2>📖 Pelajaran</h2><p class="muted">Pilih materi.</p></div></div>
     <div id="lessonGrid" class="lessonGrid"></div>
   </section>
 
   <section id="lessonView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLessons()">← Semua Pelajaran</button><button class="secondary" onclick="openImport()">📥 Import File</button></div>
+    <div class="titleRow"><button class="back" onclick="showLessons()">← Semua Pelajaran</button></div>
     <div class="lessonHero card"><div><h2 id="lessonTitle">Pelajaran</h2><p id="lessonDesc"></p></div><div><span class="tag" id="lessonCount">0 kosakata</span></div></div>
     <div class="modeGrid">
-      <div class="modeCard" onclick="openMode('vocab')"><div class="modeIcon">📚</div><h3>Kosakata</h3><p>Lihat, cari, edit, dan hapus kosakata.</p></div>
-      <div class="modeCard" onclick="openMode('kanji')"><div class="modeIcon">漢</div><h3>Kanji</h3><p>Kanji otomatis diambil dari data pelajaran.</p></div>
-      <div class="modeCard" onclick="openMode('flash')"><div class="modeIcon">🃏</div><h3>Flashcard</h3><p>Latihan mengingat kata dan arti.</p></div>
-      <div class="modeCard" onclick="openMode('quiz')"><div class="modeIcon">🧠</div><h3>Quiz</h3><p>Uji ingatan dengan pilihan jawaban.</p></div>
+      <div class="modeCard" onclick="openMode('vocab')"><div class="modeIcon">📚</div><h3>Kosakata</h3><p>Lihat dan cari kata.</p></div>
+      <div class="modeCard" onclick="openMode('kanji')"><div class="modeIcon">漢</div><h3>Kanji</h3><p>Daftar kanji otomatis.</p></div>
+      <div class="modeCard" onclick="openMode('flash')"><div class="modeIcon">🃏</div><h3>Flashcard</h3><p>Latihan mengingat.</p></div>
+      <div class="modeCard" onclick="openMode('quiz')"><div class="modeIcon">🧠</div><h3>Quiz</h3><p>Uji pilihan ganda.</p></div>
     </div>
-    <div class="lessonTools"><button class="primary" onclick="openImport()">📊 Import banyak dari Excel</button><button class="secondary" onclick="openAddOne()">＋ Tambah 1 kosakata</button><button class="secondary" onclick="editCurrentLesson()">✏️ Edit Pelajaran</button></div>
   </section>
 
   <section id="vocabView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button><button class="primary" onclick="openAddOne()">＋ Kosakata</button></div>
-    <div class="card"><div class="titleRow"><div><h2 id="vocabTitle">📚 Kosakata</h2><p class="muted">Data dari pelajaran yang sedang dipilih.</p></div></div><input id="search" class="search" placeholder="Cari Jepang, furigana, romaji, atau arti..." oninput="renderVocab()"><div class="tableWrap"><table class="table"><thead><tr><th>Jepang</th><th>Furigana</th><th>Romaji</th><th>Arti</th><th>Level</th><th>Aksi</th></tr></thead><tbody id="vocabBody"></tbody></table></div></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali</button></div>
+    <div class="card"><h2 id="vocabTitle">📚 Kosakata</h2><input id="search" class="search" placeholder="Cari kata..." oninput="renderVocab()"><div class="tableWrap"><table class="table"><thead><tr><th>Jepang</th><th>Furigana</th><th>Romaji</th><th>Arti</th><th>Level</th></tr></thead><tbody id="vocabBody"></tbody></table></div></div>
   </section>
 
   <section id="kanjiView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div>
-    <div class="titleRow"><div><h2 id="kanjiTitle">漢字 Kanji</h2><p class="muted">Kanji diambil otomatis dari kolom KANJI pada Excel.</p></div></div><input id="kanjiSearch" class="search" placeholder="Cari kanji, bacaan, atau arti..." oninput="renderKanji()"><div id="kanjiGrid" class="kanjiGrid"></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali</button></div>
+    <div class="card"><h2 id="kanjiTitle">漢字 Kanji</h2><input id="kanjiSearch" class="search" placeholder="Cari kanji..." oninput="renderKanji()"><div id="kanjiGrid" class="kanjiGrid"></div></div>
   </section>
 
   <section id="flashView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card"><div class="titleRow"><div><h2 id="flashTitle">🃏 Flashcard</h2><p class="muted">Klik kartu untuk membalik.</p></div></div><div class="flashBox"><div id="flashCard" class="flashCard" onclick="flipCard()"></div></div><div class="controls"><button class="secondary" onclick="prevCard()">← Sebelumnya</button><button class="primary" onclick="masterCard()">✓ Saya hafal</button><button class="secondary" onclick="nextCard()">Berikutnya →</button></div><div id="flashProgress" class="progressText"></div></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali</button></div>
+    <div class="card"><h2 id="flashTitle">🃏 Flashcard</h2><div class="flashBox"><div id="flashCard" class="flashCard" onclick="flipCard()"></div></div><div class="controls"><button class="secondary" onclick="prevCard()">← Prev</button><button class="primary" onclick="masterCard()">✓ Hafal</button><button class="secondary" onclick="nextCard()">Next →</button></div><div id="flashProgress" class="progressText"></div></div>
   </section>
 
   <section id="quizView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card quizCard"><div class="muted">Pertanyaan <span id="qNum">1</span></div><h2>🇮🇩 Apa arti kata ini?</h2><div id="qWord" class="quizWord">—</div><div id="qFuri" class="furigana"></div><div id="choices" class="choices"></div><div id="quizFeedback" class="feedback"></div><button class="secondary" onclick="newQuiz()">Pertanyaan berikutnya</button></div>
-  </section>
-
-  <section id="importView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card importBox"><div class="titleRow"><div><h2>📊 Import File</h2><p class="muted">Data akan masuk ke: <b id="importLessonName"></b></p></div><button class="secondary" onclick="downloadTemplate()">📄 Template</button></div><div class="importPreview"><table class="formatTable"><thead><tr><th>NO</th><th>INDONESIA</th><th>KATA SIFAT NA (な)</th><th>KANJI</th></tr></thead><tbody><tr><td>1</td><td>Cantik / Bersih</td><td>きれい（な）</td><td>—</td></tr><tr><td>2</td><td>Tampan</td><td>ハンサム（な）</td><td>—</td></tr><tr><td>3</td><td>Baik Hati</td><td>しんせつ（な）</td><td>親切（な）</td></tr></tbody></table></div><p class="small muted">Kolom <b>INDONESIA</b> = arti. Kolom <b>KATA SIFAT NA</b> = bacaan/furigana. Kolom <b>KANJI</b> = kanji. Format ini juga bisa dipakai untuk pelajaran lain.</p><input id="excelFile" type="file" accept=".xlsx,.xls,.csv,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp" style="width:100%;margin:12px 0><button class="primary" onclick="importExcel()">📥 Import ke Pelajaran Ini</button><p id="importStatus" class="status"></p></div>
-  </section>
-
-  <section id="addView" class="view">
-    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali ke Pelajaran</button></div><div class="card"><h2>＋ Tambah Kosakata</h2><p class="muted">Kosakata akan disimpan di pelajaran aktif.</p><div class="formGrid"><div class="field"><label>Kanji / Jepang</label><input id="newJp" placeholder="親切"></div><div class="field"><label>Furigana</label><input id="newFurigana" placeholder="しんせつ"></div><div class="field"><label>Romaji</label><input id="newRomaji" placeholder="shinsetsu"></div><div class="field"><label>Arti Indonesia</label><input id="newMeaning" placeholder="baik hati"></div><div class="field"><label>Level</label><select id="newLevel"><option>N5</option><option>N4</option></select></div><div class="field"><label>Contoh kalimat</label><input id="newExample" placeholder="親切な人です。"></div></div><div class="controls" style="justify-content:flex-start"><button class="primary" onclick="addVocab()">Simpan</button></div></div>
+    <div class="titleRow"><button class="back" onclick="showLesson()">← Kembali</button></div>
+    <div class="card quizCard"><div class="muted">Pertanyaan <span id="qNum">1</span></div><h2>🇮🇩 Arti kata ini?</h2><div id="qWord" class="quizWord">—</div><div id="qFuri" class="furigana"></div><div id="choices" class="choices"></div><div id="quizFeedback" class="feedback"></div><button class="secondary" onclick="newQuiz()">Soal Berikutnya</button></div>
   </section>
 </main>
-<footer>日本語 クラス • Data tersimpan di perangkat/browser kamu.</footer>
+<footer>日本語 クラス</footer>
+
+<!-- MEMANGGIL FILE KOTOBA.JS DI SINI -->
+<script src="kotoba.js"></script>
+
 <script>
 (function(){
 'use strict';
-// KUNCI SAYA UBAH AGAR MEMAKSA BROWSER MEMBACA DATA BARU INI
-const KEY='nihongoClassData_v3'; 
-
-// FORMAT: ["Kanji/Kana", "Furigana", "Romaji", "Arti", "Level"]
-const oldVocab=[
- ['私','わたし','watashi','Saya','N5'],['あなた','あなた','anata','Anda','N5'],['彼','かれ','kare','Dia (L)','N5'],['彼女','かのじょ','kanojo','Dia (P)','N5'],
- ['人','ひと','hito','Orang','N5'],['男','おとこ','otoko','Laki-laki','N5'],['女','おんな','onna','Perempuan','N5'],['子供','こども','kodomo','Anak','N5'],
- ['大人','おとな','otona','Dewasa','N5'],['先生','せんせい','sensei','Guru','N5'],['学生','がくせい','gakusei','Siswa','N5'],['友達','ともだち','tomodachi','Teman','N5'],
- ['父','ちち','chichi','Ayah (Sendiri)','N5'],['母','はは','haha','Ibu (Sendiri)','N5'],['お父さん','おとうさん','otousan','Ayah (Orang lain)','N5'],['お母さん','おかあさん','okaasan','Ibu (Orang lain)','N5'],
- ['家族','かぞく','kazoku','Keluarga','N5'],['兄弟','きょうだい','kyoudai','Saudara kandung','N5'],['犬','いぬ','inu','Anjing','N5'],['猫','ねこ','neko','Kucing','N5'],
- ['鳥','とり','tori','Burung','N5'],['魚','さかな','sakana','Ikan','N5'],['水','みず','mizu','Air','N5'],['お茶','おちゃ','ocha','Teh','N5'],
- ['ご飯','ごはん','gohan','Nasi / Makanan','N5'],['肉','にく','niku','Daging','N5'],['野菜','やさい','yasai','Sayuran','N5'],['果物','くだもの','kudamono','Buah','N5'],
- ['パン','ぱん','pan','Roti','N5'],['卵','たまご','tamago','Telur','N5'],['牛乳','ぎゅうにゅう','gyuunyuu','Susu sapi','N5'],['学校','がっこう','gakkou','Sekolah','N5'],
- ['会社','かいしゃ','kaisha','Perusahaan','N5'],['病院','びょういん','byouin','Rumah sakit','N5'],['駅','えき','eki','Stasiun','N5'],['銀行','ぎんこう','ginkou','Bank','N5'],
- ['郵便局','ゆうびんきょく','yuubinkyoku','Kantor pos','N5'],['店','みせ','mise','Toko','N5'],['家','いえ','ie','Rumah','N5'],['部屋','へや','heya','Kamar','N5'],
- ['車','くるま','kuruma','Mobil','N5'],['電車','でんしゃ','densha','Kereta api','N5'],['自転車','じてんしゃ','jitensha','Sepeda','N5'],['飛行機','ひこうき','hikouki','Pesawat','N5'],
- ['本','ほん','hon','Buku','N5'],['辞書','じしょ','jisho','Kamus','N5'],['雑誌','ざっし','zasshi','Majalah','N5'],['新聞','しんぶん','shinbun','Koran','N5'],
- ['机','つくえ','tsukue','Meja','N5'],['椅子','いす','isu','Kursi','N5'],['靴','くつ','kutsu','Sepatu','N5'],['服','ふく','fuku','Pakaian','N5'],
- ['傘','かさ','kasa','Payung','N5'],['時計','とけい','tokei','Jam','N5'],['鞄','かばん','kaban','Tas','N5'],['手紙','てがみ','tegami','Surat','N5'],
- ['写真','しゃしん','shashin','Foto','N5'],['電話','でんわ','denwa','Telepon','N5'],['お金','おかね','okane','Uang','N5'],['時間','じかん','jikan','Waktu','N5'],
- ['今日','きょう','kyou','Hari ini','N5'],['明日','あした','ashita','Besok','N5'],['昨日','きのう','kinou','Kemarin','N5'],['今','いま','ima','Sekarang','N5'],
- ['毎日','まいにち','mainichi','Setiap hari','N5'],['朝','あさ','asa','Pagi','N5'],['昼','ひる','hiru','Siang','N5'],['夜','よる','yoru','Malam','N5'],
- ['春','はる','haru','Musim semi','N5'],['夏','なつ','natsu','Musim panas','N5'],['秋','あき','aki','Musim gugur','N5'],['冬','ふゆ','fuyu','Musim dingin','N5'],
- ['月曜日','げつようび','getsuyoubi','Senin','N5'],['火曜日','かようび','kayoubi','Selasa','N5'],['水曜日','すいようび','suiyoubi','Rabu','N5'],['木曜日','もくようび','mokuyoubi','Kamis','N5'],
- ['金曜日','きんようび','kinyoubi','Jumat','N5'],['土曜日','どようび','doyoubi','Sabtu','N5'],['日曜日','にちようび','nichiyoubi','Minggu','N5'],
- ['大きい','おおきい','ookii','Besar','N5'],['小さい','ちいさい','chiisai','Kecil','N5'],['高い','たかい','takai','Tinggi/Mahal','N5'],['安い','やすい','yasui','Murah','N5'],
- ['新しい','あたらしい','atarashii','Baru','N5'],['古い','ふるい','furui','Kuno/Lama','N5'],['良い','いい','ii','Bagus/Baik','N5'],['悪い','わるい','warui','Buruk','N5'],
- ['暑い','あつい','atsui','Panas (Cuaca)','N5'],['寒い','さむい','samui','Dingin (Cuaca)','N5'],['冷たい','つめたい','tsumetai','Dingin (Benda)','N5'],['難しい','むずかしい','muzukashii','Sulit','N5'],
- ['易しい','やさしい','yasashii','Mudah','N5'],['甘い','あまい','amai','Manis','N5'],['辛い','からい','karai','Pedas','N5'],['重い','おもい','omoi','Berat','N5'],
- ['軽い','かるい','karui','Ringan','N5'],['忙しい','いそがしい','isogashii','Sibuk','N5'],['楽しい','たのしい','tanoshii','Menyenangkan','N5'],['好き','すき','suki','Suka','N5'],
- ['嫌い','きらい','kirai','Benci','N5'],['綺麗','きれい','kirei','Cantik/Bersih','N5'],['静か','しずか','shizuka','Tenang','N5'],['有名','ゆうめい','yuumei','Terkenal','N5'],
- ['親切','しんせつ','shinsetsu','Baik hati','N5'],['元気','げんき','genki','Sehat','N5'],['暇','ひま','hima','Senggang','N5'],['便利','べんり','benri','Praktis','N5'],
- ['食べる','たべる','taberu','Makan','N5'],['飲む','のむ','nomu','Minum','N5'],['行く','いく','iku','Pergi','N5'],['来る','くる','kuru','Datang','N5'],
- ['帰る','かえる','kaeru','Pulang','N5'],['見る','みる','miru','Melihat','N5'],['聞く','きく','kiku','Mendengar/Bertanya','N5'],['読む','よむ','yomu','Membaca','N5'],
- ['書く','かく','kaku','Menulis','N5'],['話す','はなす','hanasu','Berbicara','N5'],['買う','かう','kau','Membeli','N5'],['教える','おしえる','oshieru','Mengajar','N5'],
- ['寝る','ねる','neru','Tidur','N5'],['起きる','おきる','okiru','Bangun','N5'],['働く','はたらく','hataraku','Bekerja','N5'],['休む','やすむ','yasumu','Istirahat/Libur','N5'],
- ['遊ぶ','あそぶ','asobu','Bermain','N5'],['会う','あう','au','Bertemu','N5'],['待つ','まつ','matsu','Menunggu','N5'],['知る','しる','shiru','Tahu','N5'],
- ['分かる','わかる','wakaru','Mengerti','N5'],['作る','つくる','tsukuru','Membuat','N5'],['使う','つかう','tsukau','Menggunakan','N5'],['立つ','たつ','tatsu','Berdiri','N5'],
- ['座る','すわる','suwaru','Duduk','N5'],['泳ぐ','およぐ','oyogu','Berenang','N5'],['死ぬ','しぬ','shinu','Mati/Meninggal','N5'],['呼ぶ','よぶ','yobu','Memanggil','N5'],
- ['怒る','おこる','okoru','Marah','N4'],['泣く','なく','naku','Menangis','N4'],['笑う','わらう','warau','Tertawa','N4'],['喜ぶ','よろこぶ','yorokobu','Bergembira','N4'],
- ['驚く','おどろく','odoroku','Terkejut','N4'],['悲しい','かなしい','kanashii','Sedih','N4'],['寂しい','さびしい','sabishii','Kesepian','N4'],['怖い','こわい','kowai','Takut','N4'],
- ['恥ずかしい','はずかしい','hazukashii','Malu','N4'],['羨ましい','うらやましい','urayamashii','Iri hati','N4'],['素晴らしい','すばらしい','subarashii','Hebat / Luar biasa','N4'],
- ['面白い','おもしろい','omoshiroi','Menarik / Lucu','N5'],['珍しい','めずらしい','mezurashii','Langka','N4'],['美しい','うつくしい','utsukushii','Indah','N4'],
- ['複雑','ふくざつ','fukuzatsu','Rumit','N4'],['簡単','かんたん','kantan','Gampang','N5'],['心配','しんぱい','shinpai','Khawatir','N4'],['安全','あんぜん','anzen','Aman','N4']
-];
+const KEY='nihongoClassData_v4';
 
 let data=loadData();
 let activeLessonId=data.activeLessonId;
@@ -133,184 +78,85 @@ let activeLesson=getLesson();
 let current=0,flipped=false,quizIndex=0,quizLocked=false;
 
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,8);}
-function stripNa(v){return String(v??'').replace(/[（(]\s*な\s*[）)]/g,'').trim();}
-function normalizeHeader(v){return String(v??'').toLowerCase().trim().replace(/[\s_\-]+/g,'').replace(/[（）()]/g,'');}
 function getLesson(){return data.lessons.find(x=>String(x.id)===String(activeLessonId))||data.lessons[0];}
+
 function loadData(){
   try{
-    const raw=localStorage.getItem(KEY); if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.lessons)&&d.lessons.length){return d;}}
-  }catch(e){console.warn('Data lama tidak dapat dibaca, dibuat ulang.',e)}
+    const raw=localStorage.getItem(KEY); 
+    if(raw){const d=JSON.parse(raw); if(d&&Array.isArray(d.lessons)&&d.lessons.length){return d;}}
+  }catch(e){console.warn(e)}
   
-  // MODIFIKASI: Membaca array 5 kolom baru secara otomatis
-  let vocab = oldVocab.map((x,i)=>({
-      id:'v'+i, 
-      jp:x[0], 
-      furigana:x[1], 
-      romaji:x[2], 
-      meaning:x[3], 
-      level:x[4]||'N5', 
-      example:'', 
-      mastered:false
+  // Mengambil data dari file kotoba.js eksternal
+  let vocab = (window.MASTER_KOTOBA || []).map((x,i)=>({
+      id:'v'+i, jp:x[0], furigana:x[1], romaji:x[2], meaning:x[3], level:x[4]||'N5', example:'', mastered:false
   }));
 
-  const lessons=[{id:'default',name:'Kosakata N5 & N4 Lengkap',description:'Ratusan Kosakata Utama N5-N4',vocab:vocab}];
+  const lessons=[{id:'default',name:'Kosakata Master N5-N4',description:'Ribuan Kosakata Utama',vocab:vocab}];
   const d={lessons,activeLessonId:'default'};
   localStorage.setItem(KEY,JSON.stringify(d));
   return d;
 }
+
 function save(){data.activeLessonId=activeLesson.id;localStorage.setItem(KEY,JSON.stringify(data));}
 function showOnly(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});}
 window.showLessons=function(){showOnly('lessonsView');renderLessons();};
 window.showLesson=function(){showOnly('lessonView');renderLessonHome();};
 window.openMode=function(mode){if(!activeLesson)return;showOnly(mode+'View');if(mode==='vocab')renderVocab();if(mode==='kanji')renderKanji();if(mode==='flash'){current=0;flipped=false;loadCard()}if(mode==='quiz')newQuiz();};
+
 function renderLessons(){
   const grid=document.getElementById('lessonGrid');
-  grid.innerHTML=data.lessons.map(l=>`<article class="card lessonCard" onclick="selectLesson('${esc(l.id)}')"><div class="lessonIcon">📘</div><h3>${esc(l.name)}</h3><p class="muted">${esc(l.description||'Materi bahasa Jepang')}</p><div class="count">${(l.vocab||[]).length} kosakata</div><div class="lessonBtns"><button class="primary" onclick="event.stopPropagation();selectLesson('${esc(l.id)}')">Buka Pelajaran →</button><button class="secondary" onclick="event.stopPropagation();editLesson('${esc(l.id)}')">✏️ Edit</button>${l.id!=='default'?`<button class="secondary danger" onclick="event.stopPropagation();deleteLesson('${esc(l.id)}')">🗑️</button>`:''}</div></article>`).join('');
+  grid.innerHTML=data.lessons.map(l=>`<article class="card lessonCard" onclick="selectLesson('${esc(l.id)}')"><div class="lessonIcon">📘</div><h3>${esc(l.name)}</h3><p class="muted">${esc(l.description)}</p><div class="count">${(l.vocab||[]).length} kosakata</div><div class="lessonBtns"><button class="primary" onclick="event.stopPropagation();selectLesson('${esc(l.id)}')">Buka Pelajaran →</button></div></article>`).join('');
 }
 window.selectLesson=function(id){const l=data.lessons.find(x=>String(x.id)===String(id));if(!l)return;activeLesson=l;activeLessonId=l.id;current=0;flipped=false;save();showLesson();};
-window.openNewLesson=function(){const name=prompt('Nama pelajaran baru, contoh: Kata Sifat な');if(!name||!name.trim())return;const desc=prompt('Keterangan pelajaran (opsional):','Materi bahasa Jepang')||'';const l={id:uid(),name:name.trim(),description:desc.trim(),vocab:[]};data.lessons.push(l);activeLesson=l;activeLessonId=l.id;save();showLesson();};
-window.editLesson=function(id){const l=data.lessons.find(x=>String(x.id)===String(id));if(!l)return;const name=prompt('Nama pelajaran:',l.name);if(!name||!name.trim())return;const desc=prompt('Keterangan:',l.description||'')??l.description;l.name=name.trim();l.description=desc.trim();save();renderLessons();if(activeLesson.id===l.id)renderLessonHome();};
-window.editCurrentLesson=function(){editLesson(activeLesson.id);};
-window.deleteLesson=function(id){if(id==='default'){alert('Pelajaran utama tidak bisa dihapus.');return}const l=data.lessons.find(x=>String(x.id)===String(id));if(!l)return;if(!confirm('Hapus pelajaran "'+l.name+'" beserta datanya?'))return;data.lessons=data.lessons.filter(x=>String(x.id)!==String(id));activeLesson=data.lessons[0];activeLessonId=activeLesson.id;save();showLessons();};
-function renderLessonHome(){document.getElementById('lessonTitle').textContent='📘 '+activeLesson.name;document.getElementById('lessonDesc').textContent=activeLesson.description||'Materi bahasa Jepang';document.getElementById('lessonCount').textContent=(activeLesson.vocab||[]).length+' kosakata';document.getElementById('headerCount').textContent=(activeLesson.vocab||[]).length;}
-function renderVocab(){const q=(document.getElementById('search').value||'').toLowerCase();document.getElementById('vocabTitle').textContent='📚 '+activeLesson.name;const rows=(activeLesson.vocab||[]).filter(x=>(x.jp+' '+x.furigana+' '+x.romaji+' '+x.meaning).toLowerCase().includes(q));const body=document.getElementById('vocabBody');body.innerHTML=rows.length?rows.map(x=>`<tr><td><span class="jp">${esc(x.jp)}</span></td><td><span class="furigana">${esc(x.furigana||'—')}</span></td><td class="romaji">${esc(x.romaji||'—')}</td><td>${esc(x.meaning)}</td><td><span class="tag">${esc(x.level||'N5')}</span></td><td><div class="actions"><button class="secondary" onclick="editVocab('${esc(x.id)}')">✏️</button><button class="secondary" onclick="deleteVocab('${esc(x.id)}')">🗑️</button></div></td></tr>`).join(''): '<tr><td colspan="6" class="empty">Belum ada kosakata di pelajaran ini.</td></tr>';}
-window.editVocab=function(id){const x=activeLesson.vocab.find(v=>String(v.id)===String(id));if(!x)return;const jp=prompt('Kanji / Jepang:',x.jp);if(jp===null)return;const fur=prompt('Furigana:',x.furigana||'');if(fur===null)return;const rom=prompt('Romaji:',x.romaji||'');if(rom===null)return;const meaning=prompt('Arti Indonesia:',x.meaning||'');if(meaning===null)return;const level=prompt('Level (N5/N4):',x.level||'N5');if(level===null)return;const ex=prompt('Contoh kalimat:',x.example||'');if(ex===null)return;Object.assign(x,{jp:jp.trim(),furigana:fur.trim(),romaji:rom.trim(),meaning:meaning.trim(),level:level.trim().toUpperCase()==='N4'?'N4':'N5',example:ex.trim()});save();renderVocab();renderKanji();};
-window.deleteVocab=function(id){const x=activeLesson.vocab.find(v=>String(v.id)===String(id));if(!x)return;if(!confirm('Hapus "'+x.jp+'"?'))return;activeLesson.vocab=activeLesson.vocab.filter(v=>String(v.id)!==String(id));save();renderVocab();renderKanji();loadCard();};
-window.openAddOne=function(){showOnly('addView');['newJp','newFurigana','newRomaji','newMeaning','newExample'].forEach(id=>document.getElementById(id).value='');};
-window.addVocab=function(){const jp=document.getElementById('newJp').value.trim(),fur=document.getElementById('newFurigana').value.trim(),rom=document.getElementById('newRomaji').value.trim(),meaning=document.getElementById('newMeaning').value.trim(),level=document.getElementById('newLevel').value,example=document.getElementById('newExample').value.trim();if(!jp||!meaning){alert('Isi Kanji/Jepang dan arti.');return}activeLesson.vocab.push({id:uid(),jp,furigana:fur,romaji:rom,meaning,level,example,mastered:false});save();showLesson();};
-function uniqueKanjiRows(){const seen=new Set(),out=[];(activeLesson.vocab||[]).forEach(x=>{const raw=String(x.jp||'').trim();const hasKanji=/[一-龯々]/.test(raw);if(!hasKanji)return;const key=raw+'|'+(x.furigana||'');if(!seen.has(key)){seen.add(key);out.push(x)}});return out;}
-function renderKanji(){const q=(document.getElementById('kanjiSearch').value||'').toLowerCase();const rows=uniqueKanjiRows().filter(x=>(x.jp+' '+x.furigana+' '+x.meaning).toLowerCase().includes(q));document.getElementById('kanjiTitle').textContent='漢字 Kanji — '+activeLesson.name;document.getElementById('kanjiGrid').innerHTML=rows.length?rows.map(x=>`<article class="card kanjiCard"><div class="kanji">${esc(x.jp)}</div><div class="kanjiReading">${esc(x.furigana||'—')}</div><div class="kanjiMeaning">${esc(x.meaning)}</div>${x.example?`<div class="example">${esc(x.example)}</div>`:''}</article>`).join(''):'<div class="card empty">Belum ada Kanji pada pelajaran ini. Import File dengan kolom KANJI untuk mengisinya.</div>';}
+function renderLessonHome(){document.getElementById('lessonTitle').textContent='📘 '+activeLesson.name;document.getElementById('lessonDesc').textContent=activeLesson.description;document.getElementById('lessonCount').textContent=(activeLesson.vocab||[]).length+' kosakata';document.getElementById('headerCount').textContent=(activeLesson.vocab||[]).length;}
+
+function renderVocab(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  document.getElementById('vocabTitle').textContent='📚 '+activeLesson.name;
+  const rows=(activeLesson.vocab||[]).filter(x=>(x.jp+' '+x.furigana+' '+x.romaji+' '+x.meaning).toLowerCase().includes(q));
+  document.getElementById('vocabBody').innerHTML=rows.length?rows.map(x=>`<tr><td><span class="jp">${esc(x.jp)}</span></td><td><span class="furigana">${esc(x.furigana||'—')}</span></td><td class="romaji">${esc(x.romaji||'—')}</td><td>${esc(x.meaning)}</td><td><span class="tag">${esc(x.level||'N5')}</span></td></tr>`).join(''): '<tr><td colspan="5" class="empty">Tidak ada hasil.</td></tr>';
+}
+
+function uniqueKanjiRows(){const seen=new Set(),out=[];(activeLesson.vocab||[]).forEach(x=>{const raw=String(x.jp||'').trim();if(!/[一-龯々]/.test(raw))return;const key=raw+'|'+(x.furigana||'');if(!seen.has(key)){seen.add(key);out.push(x)}});return out;}
+function renderKanji(){
+  const q=(document.getElementById('kanjiSearch').value||'').toLowerCase();
+  const rows=uniqueKanjiRows().filter(x=>(x.jp+' '+x.furigana+' '+x.meaning).toLowerCase().includes(q));
+  document.getElementById('kanjiTitle').textContent='漢字 Kanji — '+activeLesson.name;
+  document.getElementById('kanjiGrid').innerHTML=rows.length?rows.map(x=>`<article class="card kanjiCard"><div class="kanji">${esc(x.jp)}</div><div class="kanjiReading">${esc(x.furigana||'—')}</div><div class="kanjiMeaning">${esc(x.meaning)}</div></article>`).join(''):'<div class="card empty">Tidak ada Kanji.</div>';
+}
+
 function cardList(){return (activeLesson.vocab||[]).filter(x=>x.jp&&x.meaning)}
 window.flipCard=function(){const list=cardList();if(!list.length)return;flipped=!flipped;renderFlash(list[current]);};
-function loadCard(){const list=cardList();const box=document.getElementById('flashCard');if(!list.length){box.innerHTML='<div><div class="big">📭</div><p class="muted">Belum ada kosakata.</p></div>';document.getElementById('flashProgress').textContent='';return}if(current>=list.length)current=0;if(current<0)current=list.length-1;renderFlash(list[current]);}
-function renderFlash(listItem){const x=listItem;document.getElementById('flashTitle').textContent='🃏 Flashcard — '+activeLesson.name;document.getElementById('flashCard').innerHTML=flipped?`<div><div class="flashHint">Jawaban</div><div class="answerMeaning">${esc(x.meaning)}</div>${x.example?`<p class="muted">${esc(x.example)}</p>`:''}</div>`:`<div><div class="flashHint">Apa arti kata ini?</div><div class="big">${esc(x.jp)}</div><div class="furigana">${esc(x.furigana||'')}</div><div class="romaji">${esc(x.romaji||'')}</div></div>`;document.getElementById('flashProgress').textContent=(current+1)+' / '+list.length;}
-window.nextCard=function(){const list=cardList();if(!list.length)return;current=(current+1)%list.length;flipped=false;loadCard();};window.prevCard=function(){const list=cardList();if(!list.length)return;current=(current-1+list.length)%list.length;flipped=false;loadCard();};window.masterCard=function(){const list=cardList();if(!list.length)return;const x=list[current];x.mastered=true;save();nextCard();};
-function newQuiz(){const list=cardList();quizLocked=false;document.getElementById('quizFeedback').textContent='';if(!list.length){document.getElementById('qWord').textContent='—';document.getElementById('qFuri').textContent='Belum ada data';document.getElementById('choices').innerHTML='';return}quizIndex=Math.floor(Math.random()*list.length);const x=list[quizIndex];document.getElementById('qNum').textContent='?';document.getElementById('qWord').textContent=x.jp;document.getElementById('qFuri').textContent=x.furigana||'';const others=list.filter((_,i)=>i!==quizIndex).sort(()=>Math.random()-.5).slice(0,3);const choices=[x,...others].sort(()=>Math.random()-.5);document.getElementById('choices').innerHTML=choices.map(c=>`<button class="choice" onclick="answerQuiz('${esc(c.id)}',this)">${esc(c.meaning)}</button>`).join('');}
-window.newQuiz=newQuiz;window.answerQuiz=function(id,btn){if(quizLocked)return;quizLocked=true;const list=cardList(),x=list[quizIndex];document.querySelectorAll('.choice').forEach(b=>b.disabled=true);if(String(id)===String(x.id)){btn.classList.add('correct');document.getElementById('quizFeedback').textContent='✅ Benar!';x.mastered=true;save()}else{btn.classList.add('wrong');document.getElementById('quizFeedback').textContent='❌ Belum tepat. Jawaban: '+x.meaning;document.querySelectorAll('.choice').forEach(b=>{if(b.textContent===x.meaning)b.classList.add('correct')})}};
-window.openImport=function(){document.getElementById('importLessonName').textContent=activeLesson.name;document.getElementById('importStatus').textContent='';document.getElementById('excelFile').value='';showOnly('importView');};
-window.importExcel=async function(){
-  const file=document.getElementById('excelFile').files[0],status=document.getElementById('importStatus');
-  if(!file){status.textContent='⚠️ Pilih file terlebih dahulu.';return}
-  status.textContent='⏳ Membaca '+file.name+'...';
-  try{
-    const ext=(file.name.split('.').pop()||'').toLowerCase();
-    let rows=[];
-    if(['xlsx','xls','csv'].includes(ext)){
-      if(typeof XLSX==='undefined') throw new Error('Library Excel belum termuat');
-      const buf=await file.arrayBuffer();
-      const wb=XLSX.read(new Uint8Array(buf),{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-    }else if(ext==='txt'){
-      const text=await file.text();
-      rows=parseTextRows(text);
-    }else if(ext==='docx'){
-      if(typeof mammoth==='undefined') throw new Error('Library Word belum termuat');
-      const buf=await file.arrayBuffer();
-      const result=await mammoth.extractRawText({arrayBuffer:buf});
-      rows=parseTextRows(result.value);
-    }else if(ext==='pdf'){
-      rows=await parsePdfRows(file);
-    }else if(['jpg','jpeg','png','webp'].includes(ext)){
-      if(typeof Tesseract==='undefined') throw new Error('Library OCR belum termuat');
-      status.textContent='⏳ Membaca gambar dengan OCR...';
-      const result=await Tesseract.recognize(file,'jpn+eng');
-      rows=parseTextRows(result.data.text);
-    }else{
-      throw new Error('Format file belum didukung');
-    }
+function loadCard(){const list=cardList();const box=document.getElementById('flashCard');if(!list.length){box.innerHTML='<div><div class="big">📭</div><p class="muted">Kosong</p></div>';document.getElementById('flashProgress').textContent='';return}if(current>=list.length)current=0;if(current<0)current=list.length-1;renderFlash(list[current]);}
+function renderFlash(listItem){
+  const x=listItem;
+  document.getElementById('flashTitle').textContent='🃏 Flashcard — '+activeLesson.name;
+  document.getElementById('flashCard').innerHTML=flipped?`<div><div class="flashHint">Arti</div><div class="answerMeaning">${esc(x.meaning)}</div></div>`:`<div><div class="flashHint">Arti kata?</div><div class="big">${esc(x.jp)}</div><div class="furigana">${esc(x.furigana||'')}</div></div>`;
+  document.getElementById('flashProgress').textContent=(current+1)+' / '+list.length;
+}
+window.nextCard=function(){const list=cardList();if(!list.length)return;current=(current+1)%list.length;flipped=false;loadCard();};
+window.prevCard=function(){const list=cardList();if(!list.length)return;current=(current-1+list.length)%list.length;flipped=false;loadCard();};
+window.masterCard=function(){nextCard();};
 
-    const mapped=rows.map((row,i)=>mapImportedRow(row,i)).filter(x=>x && x.jp && x.meaning);
-    if(!mapped.length){
-      status.textContent='⚠️ File terbaca, tetapi data tidak dikenali. Untuk hasil paling akurat gunakan format kolom: NO | INDONESIA | KATA SIFAT NA (な) | KANJI.';
-      return;
-    }
-    let added=0;
-    mapped.forEach((x,i)=>{
-      const exists=activeLesson.vocab.some(v=>v.jp===x.jp&&v.meaning===x.meaning&&v.furigana===x.furigana);
-      if(!exists){activeLesson.vocab.push({...x,id:uid()+i});added++;}
-    });
-    save(); renderLessonHome();
-    status.textContent='✅ '+added+' data berhasil dimasukkan ke "'+activeLesson.name+'". ('+mapped.length+' baris terbaca)';
-  }catch(err){
-    console.error(err);
-    status.textContent='❌ Gagal membaca file: '+(err.message||'format tidak dikenali')+'. Coba Excel/CSV jika PDF atau gambar tidak terbaca rapi.';
-  }
+function newQuiz(){
+  const list=cardList();quizLocked=false;document.getElementById('quizFeedback').textContent='';
+  if(!list.length){document.getElementById('qWord').textContent='—';document.getElementById('choices').innerHTML='';return}
+  quizIndex=Math.floor(Math.random()*list.length);const x=list[quizIndex];
+  document.getElementById('qNum').textContent='?';document.getElementById('qWord').textContent=x.jp;document.getElementById('qFuri').textContent=x.furigana||'';
+  const others=list.filter((_,i)=>i!==quizIndex).sort(()=>Math.random()-.5).slice(0,3);
+  const choices=[x,...others].sort(()=>Math.random()-.5);
+  document.getElementById('choices').innerHTML=choices.map(c=>`<button class="choice" onclick="answerQuiz('${esc(c.id)}',this)">${esc(c.meaning)}</button>`).join('');
+}
+window.newQuiz=newQuiz;
+window.answerQuiz=function(id,btn){
+  if(quizLocked)return;quizLocked=true;const list=cardList(),x=list[quizIndex];
+  document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
+  if(String(id)===String(x.id)){btn.classList.add('correct');document.getElementById('quizFeedback').textContent='✅ Benar!';}
+  else{btn.classList.add('wrong');document.getElementById('quizFeedback').textContent='❌ Salah. Jawaban: '+x.meaning;document.querySelectorAll('.choice').forEach(b=>{if(b.textContent===x.meaning)b.classList.add('correct')})}
 };
 
-function normText(v){return String(v??'').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim()}
-function parseTextRows(text){
-  const lines=String(text||'').split(/\r?\n/).map(normText).filter(Boolean);
-  if(!lines.length)return [];
-  const header=lines[0].toLowerCase();
-  if(header.includes('indonesia') && (header.includes('kanji')||header.includes('kata sifat'))){
-    const delim=header.includes('\t')?'\t':(header.includes(';')?';':',');
-    return lines.slice(1).map(line=>{
-      const a=line.split(delim).map(normText);
-      return {NO:a[0]||'',INDONESIA:a[1]||'', 'KATA SIFAT NA (な)':a[2]||'', KANJI:a[3]||''};
-    });
-  }
-  return lines.map((line,i)=>{
-    const a=line.split(/\t|\s+\|\s+|;|\s{3,}/).map(normText).filter(Boolean);
-    if(a.length>=4)return {NO:a[0],INDONESIA:a[1],'KATA SIFAT NA (な)':a[2],KANJI:a[3]};
-    if(a.length===3)return {INDONESIA:a[0],'KATA SIFAT NA (な)':a[1],KANJI:a[2]};
-    if(a.length>=2)return {INDONESIA:a[0],'KATA SIFAT NA (な)':a[1]};
-    return {INDONESIA:'', 'KATA SIFAT NA (な)':a[0]};
-  });
-}
-async function parsePdfRows(file){
-  if(!window.pdfjsLib) throw new Error('PDF reader belum siap. Muat ulang halaman lalu coba lagi');
-  const data=new Uint8Array(await file.arrayBuffer());
-  const pdf=await window.pdfjsLib.getDocument({data}).promise;
-  const out=[];
-  for(let pageNo=1;pageNo<=pdf.numPages;pageNo++){
-    const page=await pdf.getPage(pageNo), content=await page.getTextContent();
-    const items=content.items.map(it=>({t:normText(it.str),x:it.transform[4],y:it.transform[5]})).filter(it=>it.t);
-    const rows=[];
-    items.sort((a,b)=>b.y-a.y||a.x-b.x).forEach(it=>{
-      let row=rows.find(r=>Math.abs(r.y-it.y)<5);
-      if(!row){row={y:it.y,items:[]};rows.push(row)}
-      row.items.push(it);
-    });
-    rows.sort((a,b)=>b.y-a.y).forEach(r=>{
-      r.items.sort((a,b)=>a.x-b.x);
-      const cells=[];
-      r.items.forEach(it=>{
-        let cell=cells.find(c=>Math.abs(c.x-it.x)<35);
-        if(!cell){cell={x:it.x,t:it.t};cells.push(cell)}
-        else cell.t+=' '+it.t;
-      });
-      const vals=cells.sort((a,b)=>a.x-b.x).map(c=>normText(c.t));
-      if(vals.length>=4) out.push({NO:vals[0],INDONESIA:vals[1],'KATA SIFAT NA (な)':vals[2],KANJI:vals.slice(3).join(' ')});
-      else if(vals.length>=2) out.push({INDONESIA:vals[0],'KATA SIFAT NA (な)':vals[1],KANJI:vals[2]||''});
-    });
-  }
-  return out;
-}
-function mapImportedRow(row,i){
-  const o={}; Object.keys(row||{}).forEach(k=>o[normalizeHeader(k)]=row[k]);
-  let meaning=normText(o.indonesia||o.arti||o.meaning||o.terjemahan||'');
-  let reading=normText(o.katasifatnaな||o.katasifatna||o.katabacaan||o.bacaan||o.furigana||o.hiragana||o.jepang||o.kata||o.reading||'');
-  let kanji=normText(o.kanji||'');
-  reading=stripNa(reading); kanji=stripNa(kanji);
-  if(!reading && !kanji){
-    const vals=Object.values(row||{}).map(normText);
-    const jp=vals.find(v=>/[\u3040-\u30ff\u3400-\u9fff]/.test(v));
-    if(jp) reading=jp;
-    if(!meaning) meaning=vals.find(v=>v && !/[\u3040-\u30ff\u3400-\u9fff]/.test(v) && !/^\d+$/.test(v))||'';
-  }
-  const jp=kanji&&kanji!=='—'&&kanji!=='-'?kanji:reading;
-  if(!jp||!meaning)return null;
-  return {
-    jp, furigana:reading, romaji:normText(o.romaji||o.romaji_||''),
-    meaning, level:(String(o.level||'N5').toUpperCase()==='N4'?'N4':'N5'),
-    example:normText(o.contoh||o.example||o.reibun||''), mastered:false
-  };
-}
-window.downloadTemplate=function(){if(typeof XLSX==='undefined'){alert('Library Excel belum termuat. Pastikan internet aktif.');return}const data=[['NO','INDONESIA','KATA SIFAT NA (な)','KANJI'],[1,'Cantik / Bersih','きれい（な）','—'],[2,'Tampan','ハンサム（な）','—'],[3,'Baik Hati','しんせつ（な）','親切（な）'],[4,'Sehat','げんき（な）','元気（な）'],[5,'Terkenal','ゆうめい（な）','有名（な）'],[6,'Ramai','にぎやか（な）','—'],[7,'Sepi, Tenang','しずか（な）','静か（な）']];const ws=XLSX.utils.aoa_to_sheet(data),wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Kosakata');XLSX.writeFile(wb,'template_kosakata_jp.xlsx');};
-function init(){renderLessons();renderLessonHome();}
 init();
+function init(){renderLessons();renderLessonHome();}
 })();
 </script>
 </body>
